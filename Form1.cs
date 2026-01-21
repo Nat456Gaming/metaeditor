@@ -1,4 +1,5 @@
 using System.Collections.Specialized;
+using System.Security;
 
 namespace metaeditor
 {
@@ -48,6 +49,24 @@ namespace metaeditor
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
+            {
+                textBox2.Text = folderBrowserDialog1.SelectedPath;
+            }
+        }
+
+        private void openFileDialog1_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+
+        }
+
+        private void textBox2_TextChanged(object sender, EventArgs e)
+        {
+            
         }
     }
 }
