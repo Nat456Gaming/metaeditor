@@ -39,6 +39,7 @@
             label1 = new Label();
             button1 = new Button();
             listView1 = new ListView();
+            treeView1 = new TreeView();
             folderBrowserDialog1 = new FolderBrowserDialog();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
@@ -69,8 +70,9 @@
             // splitContainer1.Panel2
             // 
             splitContainer1.Panel2.Controls.Add(listView1);
-            splitContainer1.Size = new Size(1360, 600);
-            splitContainer1.SplitterDistance = 514;
+            splitContainer1.Panel2.Controls.Add(treeView1);
+            splitContainer1.Size = new Size(1326, 503);
+            splitContainer1.SplitterDistance = 404;
             splitContainer1.SplitterWidth = 3;
             splitContainer1.TabIndex = 0;
             // 
@@ -159,7 +161,7 @@
             // button1
             // 
             button1.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            button1.Location = new Point(418, 561);
+            button1.Location = new Point(308, 464);
             button1.Margin = new Padding(2);
             button1.Name = "button1";
             button1.Size = new Size(90, 27);
@@ -170,20 +172,27 @@
             // 
             // listView1
             // 
-            listView1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            listView1.Location = new Point(0, 0);
-            listView1.Margin = new Padding(0);
+            listView1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            listView1.Location = new Point(3, 3);
             listView1.Name = "listView1";
-            listView1.Size = new Size(838, 596);
-            listView1.TabIndex = 0;
+            listView1.Size = new Size(909, 71);
+            listView1.TabIndex = 10;
             listView1.UseCompatibleStateImageBehavior = false;
-            listView1.SelectedIndexChanged += listView1_SelectedIndexChanged;
+            // 
+            // treeView1
+            // 
+            treeView1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            treeView1.Location = new Point(2, 77);
+            treeView1.Name = "treeView1";
+            treeView1.Size = new Size(910, 414);
+            treeView1.TabIndex = 9;
+            treeView1.AfterSelect += treeView1_AfterSelect_1;
             // 
             // MetaEditor
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1360, 600);
+            ClientSize = new Size(1326, 503);
             Controls.Add(splitContainer1);
             Name = "MetaEditor";
             Text = "MetaEditor";
@@ -199,7 +208,6 @@
 
         private SplitContainer splitContainer1;
         private Button button1;
-        private ListView listView1;
         private Label label1;
         private TextBox textBox1;
         private CheckBox checkBox3;
@@ -209,5 +217,7 @@
         private Label label2;
         private TextBox textBox2;
         private FolderBrowserDialog folderBrowserDialog1;
+        private TreeView treeView1;
+        private ListView listView1;
     }
 }
