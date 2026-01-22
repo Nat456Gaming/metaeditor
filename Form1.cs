@@ -10,31 +10,6 @@ namespace metaeditor
             InitializeComponent();
         }
 
-        private void label1_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
-        {
-
-        }
-
-        private void listView1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label1_Click_1(object sender, EventArgs e)
-        {
-
-        }
-
         private void button1_Click_1(object sender, EventArgs e)
         {
 
@@ -54,19 +29,15 @@ namespace metaeditor
         {
             if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
             {
-                textBox2.Text = folderBrowserDialog1.SelectedPath;
+                PathBox.Text = folderBrowserDialog1.SelectedPath;
             }
         }
 
-        private void openFileDialog1_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-
-        }
 
         private void textBox2_TextChanged(object sender, EventArgs e)
         {
             //Affectation du chemin d'accès à variable locale
-            string rootPath = textBox2.Text;
+            string rootPath = PathBox.Text;
             //Test si le chemin existe
             if (Directory.Exists(rootPath))
             {
@@ -75,16 +46,20 @@ namespace metaeditor
                 //Extension de fichier que l'on veut
                 string[] imageExtensions = { ".jpg", ".jpeg", ".png" };
                 //Création de noeuds
-                TreeNode rootNode = new TreeNode(Path.GetFileName(rootPath));
-                rootNode.Tag = rootPath;
+                TreeNode rootNode = new(Path.GetFileName(rootPath))
+                {
+                    Tag = rootPath
+                };
                 treeView1.Nodes.Add(rootNode);
                 void LoadDirectory(string path, TreeNode parentNode)
                 {
                     // Sous-dossiers
                     foreach (string dir in Directory.GetDirectories(path))
                     {
-                        TreeNode dirNode = new TreeNode(Path.GetFileName(dir));
-                        dirNode.Tag = dir;
+                        TreeNode dirNode = new(Path.GetFileName(dir))
+                        {
+                            Tag = dir
+                        };
                         parentNode.Nodes.Add(dirNode);
 
                         LoadDirectory(dir, dirNode);
@@ -100,7 +75,7 @@ namespace metaeditor
                             {
                                 using (Image img = Image.FromFile(file))
                                 {
-                                    text += $" ({img.Width}x{img.Height})";
+                                    text += $" ({img.Width}x{img.Height}) => {String.Join(",",img.PropertyIdList)}";
                                 }
                             }
                             catch { }
