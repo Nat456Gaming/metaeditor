@@ -1,5 +1,8 @@
 using System.Collections.Specialized;
+using System.Reflection.Metadata;
 using System.Security;
+using System.Text.RegularExpressions;
+using System.Windows.Forms.Design;
 
 namespace metaeditor
 {
@@ -10,22 +13,12 @@ namespace metaeditor
             InitializeComponent();
         }
 
-        private void button1_Click_1(object sender, EventArgs e)
+        private void ApplyButton_Click(object sender, EventArgs e)
         {
 
         }
 
-        private void textBox1_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void checkBox1_CheckedChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void button2_Click(object sender, EventArgs e)
+        private void SelPathButton_Click(object sender, EventArgs e)
         {
             if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
             {
@@ -33,8 +26,7 @@ namespace metaeditor
             }
         }
 
-
-        private void textBox2_TextChanged(object sender, EventArgs e)
+        private void PathBox_TextChanged(object sender, EventArgs e)
         {
             //Affectation du chemin d'accès à variable locale
             string rootPath = PathBox.Text;
@@ -42,15 +34,15 @@ namespace metaeditor
             if (Directory.Exists(rootPath))
             {
                 //Effacer le TreeView
-                treeView1.Nodes.Clear();
+                FilesList.Nodes.Clear();
                 //Extension de fichier que l'on veut
-                string[] imageExtensions = { ".jpg", ".jpeg", ".png" };
+                string[] imageExtensions = [".jpg", ".jpeg", ".png", ".tiff", ".exif"];
                 //Création de noeuds
                 TreeNode rootNode = new(Path.GetFileName(rootPath))
                 {
                     Tag = rootPath
                 };
-                treeView1.Nodes.Add(rootNode);
+                FilesList.Nodes.Add(rootNode);
                 void LoadDirectory(string path, TreeNode parentNode)
                 {
                     // Sous-dossiers
@@ -73,10 +65,8 @@ namespace metaeditor
                             string text = Path.GetFileName(file);
                             try
                             {
-                                using (Image img = Image.FromFile(file))
-                                {
-                                    text += $" ({img.Width}x{img.Height}) => {String.Join(",",img.PropertyIdList)}";
-                                }
+                                using Image img = Image.FromFile(file);
+                                text += $" ({img.Width}x{img.Height}) => {String.Join(",", img.PropertyIdList)}";
                             }
                             catch { }
                             TreeNode fileNode = new TreeNode(text);
@@ -88,11 +78,68 @@ namespace metaeditor
                 LoadDirectory(rootPath, rootNode);
                 rootNode.Expand();
             }
+            UpdateSelection();
         }
 
-        private void treeView1_AfterSelect_1(object sender, TreeViewEventArgs e)
+        private void MatchCase_CheckedChanged(object sender, EventArgs e)
         {
+            UpdateSelection();
+        }
 
+        private void FileSelection_TextChanged(object sender, EventArgs e)
+        {
+            UpdateSelection();
+        }
+
+        private void UseRegex_CheckedChanged(object sender, EventArgs e)
+        {
+            UpdateSelection();
+        }
+
+        private void UpdateSelection()
+        {
+            string selection = FileSelection.Text;
+            if (MatchCase.Checked)
+            {
+                selection = selection.Replace(" ", string.Empty);
+                selection = selection.ToLower();
+            }
+            /*foreach (var file in FilesList.Nodes)
+            {
+                if(file.GetType)
+            }*/
+            //logs.Text = FilesList.Nodes[0].Nodes[0].ForeColor.ToString();
+            //FilesList.Nodes[0].Nodes[0].ForeColor = Color.Blue;
+            logs.Text = selection;
+            RecursiveSearch(FilesList.Nodes, selection);
+        }
+
+        private void RecursiveSearch(TreeNodeCollection rootNode, string selection)
+        {
+            foreach (TreeNode node in rootNode)
+            {
+                if(node.Nodes.Count > 0)
+                {
+                    RecursiveSearch(node.Nodes, selection);
+                }
+                else
+                {
+                    string FileName = node.Tag.ToString().Split('/')[^1];
+                    if (MatchCase.Checked)
+                    {
+                        FileName = FileName.ToLower();
+                        FileName = FileName.Replace(" ", string.Empty);
+                    }
+                    if(FileName.Contains(selection))
+                    {
+                        node.ForeColor = Color.Green;
+                    }
+                    else
+                    {
+                        node.ForeColor = Color.Red;
+                    }
+                }
+            }
         }
     }
 }
