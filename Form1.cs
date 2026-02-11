@@ -3,6 +3,7 @@ using System.Reflection.Metadata;
 using System.Security;
 using System.Text.RegularExpressions;
 using System.Windows.Forms.Design;
+using System.Xml.Linq;
 
 namespace metaeditor
 {
@@ -33,50 +34,53 @@ namespace metaeditor
             //Test si le chemin existe
             if (Directory.Exists(rootPath))
             {
-                //Effacer le TreeView
-                FilesList.Nodes.Clear();
+                //Effacer le ListView
+                FilesView.Items.Clear();
+                FilesView.Groups.Clear();
                 //Extension de fichier que l'on veut
-                string[] imageExtensions = [".jpg", ".jpeg", ".png", ".tiff", ".exif"];
+                string[] imageExtensions = { ".jpg", ".jpeg", ".png", ".tiff", ".exif"};
                 //Création de noeuds
-                TreeNode rootNode = new(Path.GetFileName(rootPath))
+                void LoadDirectory(string path)
                 {
-                    Tag = rootPath
-                };
-                FilesList.Nodes.Add(rootNode);
-                void LoadDirectory(string path, TreeNode parentNode)
-                {
+                    // Créer un groupe pour le dossier courant
+                    string groupName = Path.GetRelativePath(rootPath, path);
+                    if (groupName == ".")
+                    {
+                        groupName = Path.GetFileName(path);
+                    }
+                    ListViewGroup group = new ListViewGroup(groupName);
+                    FilesView.Groups.Add(group);
+                    // Images du dossier A TESTER
+                    foreach (string file in Directory.GetFiles(path))
+                    {
+                        string ext = Path.GetExtension(file).ToLower(); // avoir les extensions en minuscule exemple : au lieu de .PNG on aura .png
+                        if (!imageExtensions.Contains(ext)) //test si le fichier n'est pas une image, on peut l'enlever si non nécessaire
+                        {
+                            continue;
+                        }
+                        string dimensions = "";
+                        /*try
+                        {
+                            //using (Image img = Image.FromFile(file)) dimensions = $"{img.Width}x{img.Height}"; //Dimension de l'icone
+                        }
+                        catch { }*/
+                        //Mise en place de la ListView
+                        ListViewItem item = new ListViewItem(Path.GetFileName(file));
+                        item.SubItems.Add(dimensions);
+                        item.SubItems.Add(groupName);
+                        item.SubItems.Add("Preview ..."); //futur nom
+                        item.Tag = file;
+                        item.Group = group;
+                        //Finalisation
+                        FilesView.Items.Add(item);
+                    }
                     // Sous-dossiers
                     foreach (string dir in Directory.GetDirectories(path))
                     {
-                        TreeNode dirNode = new(Path.GetFileName(dir))
-                        {
-                            Tag = dir
-                        };
-                        parentNode.Nodes.Add(dirNode);
-
-                        LoadDirectory(dir, dirNode);
-                    }
-                    // Fichiers images
-                    foreach (string file in Directory.GetFiles(path))
-                    {
-                        string ext = Path.GetExtension(file).ToLower();
-                        if (imageExtensions.Contains(ext))
-                        {
-                            string text = Path.GetFileName(file);
-                            try
-                            {
-                                using Image img = Image.FromFile(file);
-                                text += $" ({img.Width}x{img.Height}) => {String.Join(",", img.PropertyIdList)}";
-                            }
-                            catch { }
-                            TreeNode fileNode = new TreeNode(text);
-                            fileNode.Tag = file;
-                            parentNode.Nodes.Add(fileNode);
-                        }
+                        LoadDirectory(dir); //ATTENTION récursive
                     }
                 }
-                LoadDirectory(rootPath, rootNode);
-                rootNode.Expand();
+                LoadDirectory(rootPath);
             }
             UpdateSelection();
         }
@@ -104,40 +108,21 @@ namespace metaeditor
                 selection = selection.Replace(" ", string.Empty);
                 selection = selection.ToLower();
             }
-            /*foreach (var file in FilesList.Nodes)
+            foreach (ListViewItem item in FilesView.Items)
             {
-                if(file.GetType)
-            }*/
-            //logs.Text = FilesList.Nodes[0].Nodes[0].ForeColor.ToString();
-            //FilesList.Nodes[0].Nodes[0].ForeColor = Color.Blue;
-            logs.Text = selection;
-            RecursiveSearch(FilesList.Nodes, selection);
-        }
-
-        private void RecursiveSearch(TreeNodeCollection rootNode, string selection)
-        {
-            foreach (TreeNode node in rootNode)
-            {
-                if(node.Nodes.Count > 0)
+                string FileName = item.Text;
+                if (MatchCase.Checked)
                 {
-                    RecursiveSearch(node.Nodes, selection);
+                    FileName = FileName.ToLower();
+                    FileName = FileName.Replace(" ", string.Empty);
+                }
+                if ((FileName.Contains(selection) && !UseRegex.Checked))
+                {
+                    item.ForeColor = Color.Green;
                 }
                 else
                 {
-                    string FileName = node.Tag.ToString().Split('/')[^1];
-                    if (MatchCase.Checked)
-                    {
-                        FileName = FileName.ToLower();
-                        FileName = FileName.Replace(" ", string.Empty);
-                    }
-                    if(FileName.Contains(selection))
-                    {
-                        node.ForeColor = Color.Green;
-                    }
-                    else
-                    {
-                        node.ForeColor = Color.Red;
-                    }
+                    item.ForeColor = Color.Red;
                 }
             }
         }

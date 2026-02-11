@@ -29,14 +29,13 @@
         private void InitializeComponent()
         {
             splitContainer1 = new SplitContainer();
-            logs = new Label();
             UseRegex = new CheckBox();
             FileSelection = new TextBox();
             SelPathButton = new Button();
             PathBox = new TextBox();
             MatchCase = new CheckBox();
             ApplyButton = new Button();
-            FilesList = new TreeView();
+            FilesView = new ListView();
             folderBrowserDialog1 = new FolderBrowserDialog();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
@@ -54,7 +53,6 @@
             // 
             // splitContainer1.Panel1
             // 
-            splitContainer1.Panel1.Controls.Add(logs);
             splitContainer1.Panel1.Controls.Add(UseRegex);
             splitContainer1.Panel1.Controls.Add(FileSelection);
             splitContainer1.Panel1.Controls.Add(SelPathButton);
@@ -64,26 +62,19 @@
             // 
             // splitContainer1.Panel2
             // 
-            splitContainer1.Panel2.Controls.Add(FilesList);
-            splitContainer1.Size = new Size(1272, 789);
-            splitContainer1.SplitterDistance = 384;
+            splitContainer1.Panel2.Controls.Add(FilesView);
+            splitContainer1.Size = new Size(1018, 631);
+            splitContainer1.SplitterDistance = 307;
+            splitContainer1.SplitterWidth = 3;
             splitContainer1.TabIndex = 0;
-            // 
-            // logs
-            // 
-            logs.AutoSize = true;
-            logs.Location = new Point(3, 498);
-            logs.Name = "logs";
-            logs.Size = new Size(59, 25);
-            logs.TabIndex = 11;
-            logs.Text = "label1";
             // 
             // UseRegex
             // 
             UseRegex.AutoSize = true;
-            UseRegex.Location = new Point(10, 84);
+            UseRegex.Location = new Point(8, 67);
+            UseRegex.Margin = new Padding(2);
             UseRegex.Name = "UseRegex";
-            UseRegex.Size = new Size(295, 29);
+            UseRegex.Size = new Size(248, 24);
             UseRegex.TabIndex = 10;
             UseRegex.Text = "Utiliser les expressions régulières";
             UseRegex.UseVisualStyleBackColor = true;
@@ -92,20 +83,21 @@
             // FileSelection
             // 
             FileSelection.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            FileSelection.Location = new Point(10, 47);
+            FileSelection.Location = new Point(8, 38);
+            FileSelection.Margin = new Padding(2);
             FileSelection.Name = "FileSelection";
             FileSelection.PlaceholderText = "Fichiers à sélectionner";
-            FileSelection.Size = new Size(364, 31);
+            FileSelection.Size = new Size(291, 27);
             FileSelection.TabIndex = 9;
             FileSelection.TextChanged += FileSelection_TextChanged;
             // 
             // SelPathButton
             // 
             SelPathButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            SelPathButton.Location = new Point(325, 9);
+            SelPathButton.Location = new Point(259, 7);
             SelPathButton.Margin = new Padding(2);
             SelPathButton.Name = "SelPathButton";
-            SelPathButton.Size = new Size(49, 34);
+            SelPathButton.Size = new Size(39, 27);
             SelPathButton.TabIndex = 8;
             SelPathButton.Text = ". . .";
             SelPathButton.UseVisualStyleBackColor = true;
@@ -114,21 +106,21 @@
             // PathBox
             // 
             PathBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            PathBox.Location = new Point(10, 11);
+            PathBox.Location = new Point(8, 9);
             PathBox.Margin = new Padding(2);
             PathBox.Name = "PathBox";
             PathBox.PlaceholderText = "Chemin d'accès";
-            PathBox.Size = new Size(311, 31);
+            PathBox.Size = new Size(249, 27);
             PathBox.TabIndex = 6;
             PathBox.TextChanged += PathBox_TextChanged;
             // 
             // MatchCase
             // 
             MatchCase.AutoSize = true;
-            MatchCase.Location = new Point(10, 118);
+            MatchCase.Location = new Point(8, 94);
             MatchCase.Margin = new Padding(2);
             MatchCase.Name = "MatchCase";
-            MatchCase.Size = new Size(179, 29);
+            MatchCase.Size = new Size(151, 24);
             MatchCase.TabIndex = 5;
             MatchCase.Text = "Respecter la casse";
             MatchCase.UseVisualStyleBackColor = true;
@@ -137,31 +129,31 @@
             // ApplyButton
             // 
             ApplyButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            ApplyButton.Location = new Point(265, 741);
+            ApplyButton.Location = new Point(211, 592);
             ApplyButton.Margin = new Padding(2);
             ApplyButton.Name = "ApplyButton";
-            ApplyButton.Size = new Size(112, 34);
+            ApplyButton.Size = new Size(90, 27);
             ApplyButton.TabIndex = 0;
             ApplyButton.Text = "Appliquer";
             ApplyButton.UseVisualStyleBackColor = true;
             ApplyButton.Click += ApplyButton_Click;
             // 
-            // FilesList
+            // FilesView
             // 
-            FilesList.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            FilesList.Location = new Point(4, 51);
-            FilesList.Margin = new Padding(4);
-            FilesList.Name = "FilesList";
-            FilesList.Size = new Size(872, 729);
-            FilesList.TabIndex = 9;
+            FilesView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            FilesView.Location = new Point(3, 0);
+            FilesView.Name = "FilesView";
+            FilesView.Size = new Size(698, 624);
+            FilesView.TabIndex = 10;
+            FilesView.UseCompatibleStateImageBehavior = false;
+            FilesView.View = View.Tile;
             // 
             // MetaEditor
             // 
-            AutoScaleDimensions = new SizeF(10F, 25F);
+            AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1272, 789);
+            ClientSize = new Size(1018, 631);
             Controls.Add(splitContainer1);
-            Margin = new Padding(4);
             Name = "MetaEditor";
             Text = "MetaEditor";
             splitContainer1.Panel1.ResumeLayout(false);
@@ -180,9 +172,8 @@
         private Button SelPathButton;
         private TextBox PathBox;
         private FolderBrowserDialog folderBrowserDialog1;
-        private TreeView FilesList;
         private CheckBox UseRegex;
         private TextBox FileSelection;
-        private Label logs;
+        private ListView FilesView;
     }
 }
