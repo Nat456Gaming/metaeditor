@@ -140,10 +140,10 @@
             // MatchCase
             // 
             MatchCase.AutoSize = true;
-            MatchCase.Location = new Point(8, 94);
+            MatchCase.Location = new Point(10, 117);
             MatchCase.Margin = new Padding(2);
             MatchCase.Name = "MatchCase";
-            MatchCase.Size = new Size(151, 24);
+            MatchCase.Size = new Size(179, 29);
             MatchCase.TabIndex = 5;
             MatchCase.Text = "Respecter la casse";
             MatchCase.UseVisualStyleBackColor = true;
