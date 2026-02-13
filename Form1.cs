@@ -29,7 +29,7 @@ namespace metaeditor
 
         private void PathBox_TextChanged(object sender, EventArgs e)
         {
-            //Affectation du chemin d'accès à variable locale
+            //Affectation du chemin d'accÃ¨s Ã  variable locale
             string rootPath = PathBox.Text;
             //Test si le chemin existe
             if (Directory.Exists(rootPath))
@@ -39,10 +39,10 @@ namespace metaeditor
                 FilesView.Groups.Clear();
                 //Extension de fichier que l'on veut
                 string[] imageExtensions = { ".jpg", ".jpeg", ".png", ".tiff", ".exif"};
-                //Création de noeuds
+                //CrÃ©ation de noeuds
                 void LoadDirectory(string path)
                 {
-                    // Créer un groupe pour le dossier courant
+                    // CrÃ©er un groupe pour le dossier courant
                     string groupName = Path.GetRelativePath(rootPath, path);
                     if (groupName == ".")
                     {
@@ -54,7 +54,7 @@ namespace metaeditor
                     foreach (string file in Directory.GetFiles(path))
                     {
                         string ext = Path.GetExtension(file).ToLower(); // avoir les extensions en minuscule exemple : au lieu de .PNG on aura .png
-                        if (!imageExtensions.Contains(ext)) //test si le fichier n'est pas une image, on peut l'enlever si non nécessaire
+                        if (!imageExtensions.Contains(ext)) //test si le fichier n'est pas une image, on peut l'enlever si non nÃ©cessaire
                         {
                             continue;
                         }
@@ -77,7 +77,7 @@ namespace metaeditor
                     // Sous-dossiers
                     foreach (string dir in Directory.GetDirectories(path))
                     {
-                        LoadDirectory(dir); //ATTENTION récursive
+                        LoadDirectory(dir); //ATTENTION rÃ©cursive
                     }
                 }
                 LoadDirectory(rootPath);
@@ -125,6 +125,78 @@ namespace metaeditor
                     item.ForeColor = Color.Red;
                 }
             }
+        }
+        public class PropertyEditor
+        {
+            private Panel m_panel;
+            private System.Windows.Forms.TextBox m_textBox;
+            private System.Windows.Forms.Button m_close;
+            private System.Windows.Forms.ComboBox m_comboBox;
+            private FlowLayoutPanel m_PropertyListPanel;
+            
+            public PropertyEditor(FlowLayoutPanel PropertyListPanel)
+            {
+                m_panel = new Panel();
+                m_textBox = new System.Windows.Forms.TextBox();
+                m_close = new System.Windows.Forms.Button();
+                m_comboBox = new System.Windows.Forms.ComboBox();
+                m_PropertyListPanel = PropertyListPanel;
+
+                m_PropertyListPanel.Controls.Add(m_panel);
+
+                // 
+                // panel1
+                // 
+                m_panel.BorderStyle = BorderStyle.Fixed3D;
+                m_panel.Controls.Add(m_textBox);
+                m_panel.Controls.Add(m_close);
+                m_panel.Controls.Add(m_comboBox);
+                m_panel.Location = new Point(3, 3);
+                m_panel.Name = "panel1";
+                m_panel.Size = new Size(346, 81);
+                m_panel.TabIndex = 0;
+                // 
+                // close
+                // 
+                //m_close.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+                m_close.Location = new Point(305, 3);
+                m_close.Name = "close";
+                m_close.Size = new Size(34, 34);
+                m_close.TabIndex = 1;
+                m_close.Text = "x";
+                m_close.UseVisualStyleBackColor = true;
+                m_close.Click += m_close_Click;
+                // 
+                // comboBox1
+                // 
+                m_comboBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+                m_comboBox.FormattingEnabled = true;
+                m_comboBox.Location = new Point(3, 3);
+                m_comboBox.Name = "comboBox1";
+                m_comboBox.Size = new Size(296, 33);
+                m_comboBox.TabIndex = 0;
+                // 
+                // textBox1
+                // 
+                m_textBox.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+                m_textBox.Location = new Point(3, 42);
+                m_textBox.Name = "textBox1";
+                m_textBox.Size = new Size(336, 31);
+                m_textBox.TabIndex = 2;
+            }
+
+            private void m_close_Click(object sender, EventArgs e)
+            {
+                m_PropertyListPanel.Controls.Remove(m_panel);
+                m_panel.Controls.Remove(m_textBox);
+                m_panel.Controls.Remove(m_close);
+                m_panel.Controls.Remove(m_comboBox);
+            }
+        }
+
+        private void AddPropertyEditorButton_Click(object sender, EventArgs e)
+        {
+            new PropertyEditor(PropertyListPanel);
         }
     }
 }
