@@ -29,26 +29,45 @@
         private void InitializeComponent()
         {
             PictureBox = new PictureBox();
+            TextDataDiaplay = new Label();
             ((System.ComponentModel.ISupportInitialize)PictureBox).BeginInit();
             SuspendLayout();
             // 
             // PictureBox
             // 
-            PictureBox.Location = new Point(2, 2);
+            PictureBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            PictureBox.Location = new Point(0, 0);
+            PictureBox.Margin = new Padding(0, 0, 0, 2);
             PictureBox.Name = "PictureBox";
-            PictureBox.Size = new Size(144, 238);
-            PictureBox.SizeMode = PictureBoxSizeMode.StretchImage;
+            PictureBox.Size = new Size(200, 150);
+            PictureBox.SizeMode = PictureBoxSizeMode.Zoom;
             PictureBox.TabIndex = 0;
             PictureBox.TabStop = false;
             // 
+            // TextDataDiaplay
+            // 
+            TextDataDiaplay.AutoEllipsis = true;
+            TextDataDiaplay.AutoSize = true;
+            TextDataDiaplay.Location = new Point(0, 150);
+            TextDataDiaplay.Margin = new Padding(0);
+            TextDataDiaplay.MaximumSize = new Size(200, 0);
+            TextDataDiaplay.Name = "TextDataDiaplay";
+            TextDataDiaplay.Size = new Size(38, 15);
+            TextDataDiaplay.TabIndex = 1;
+            TextDataDiaplay.Text = "label1";
+            // 
             // OverlayImage
             // 
-            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(148, 245);
+            AutoSize = true;
+            AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            ClientSize = new Size(200, 200);
             ControlBox = false;
+            Controls.Add(TextDataDiaplay);
             Controls.Add(PictureBox);
             FormBorderStyle = FormBorderStyle.None;
+            Margin = new Padding(3, 2, 3, 2);
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "OverlayImage";
@@ -58,10 +77,12 @@
             TopMost = true;
             ((System.ComponentModel.ISupportInitialize)PictureBox).EndInit();
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
 
         private PictureBox PictureBox;
+        private Label TextDataDiaplay;
     }
 }
