@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Specialized;
 using System.Reflection.Metadata;
 using System.Security;
@@ -9,14 +10,22 @@ namespace metaeditor
 {
     public partial class MetaEditor : Form
     {
+        //Creation de la fenetre pour affichage MouseMove
+        private OverlayImage previewForm;
+        //Mise en place d'une sécurité pour éviter d'afficher en continu pour MouseMove
+        ListViewItem? lastItem = null;
+
         public MetaEditor()
         {
             InitializeComponent();
+            previewForm = new OverlayImage(this);
         }
 
         private void ApplyButton_Click(object sender, EventArgs e)
         {
-
+            //OverlayImage test = new OverlayImage(this);
+            //test.SetImage(PathBox.Text + "\\xwing.jpg");
+            //test.Show();
         }
 
         private void SelPathButton_Click(object sender, EventArgs e)
@@ -38,7 +47,7 @@ namespace metaeditor
                 FilesView.Items.Clear();
                 FilesView.Groups.Clear();
                 //Extension de fichier que l'on veut
-                string[] imageExtensions = { ".jpg", ".jpeg", ".png", ".tiff", ".exif"};
+                string[] imageExtensions = { ".jpg", ".jpeg", ".png", ".tiff", ".exif" };
                 //Création de noeuds
                 void LoadDirectory(string path)
                 {
@@ -126,6 +135,7 @@ namespace metaeditor
                 }
             }
         }
+
         public class PropertyEditor
         {
             private Panel m_panel;
@@ -133,7 +143,7 @@ namespace metaeditor
             private System.Windows.Forms.Button m_close;
             private System.Windows.Forms.ComboBox m_comboBox;
             private FlowLayoutPanel m_PropertyListPanel;
-            
+
             public PropertyEditor(FlowLayoutPanel PropertyListPanel)
             {
                 m_panel = new Panel();
@@ -197,6 +207,36 @@ namespace metaeditor
         private void AddPropertyEditorButton_Click(object sender, EventArgs e)
         {
             new PropertyEditor(PropertyListPanel);
+        }
+
+        private void FilesView_MouseMove(object sender, MouseEventArgs e)
+        {
+            //Accès de l'item
+            ListViewItem? item = FilesView.GetItemAt(e.X, e.Y);
+            //Commencer l'affichage
+            if (item != null)
+            {
+                //On recharge si on change d'item
+                if (item != lastItem)
+                {
+                    lastItem = item;
+                    string ImagePath = item.Tag?.ToString(); //Chemin complet stocker dans l'image
+                    if (File.Exists(ImagePath))
+                    {
+                        previewForm.SetImage(ImagePath);
+                        //previewForm.Size = new Size(300, 300);
+                        previewForm.Show();
+                    }
+                    //Afficher la fenêtre a une position décalée par raport au souris
+                    previewForm.Location = new Point(Cursor.Position.X + 15, Cursor.Position.Y + 15);
+                }
+            }
+        }
+
+        private void FilesView_MouseLeave(object sender, EventArgs e)
+        {
+            previewForm.Hide();
+            lastItem = null;
         }
     }
 }
