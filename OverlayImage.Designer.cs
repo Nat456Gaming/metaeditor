@@ -37,9 +37,9 @@
             // 
             PictureBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             PictureBox.Location = new Point(0, 0);
-            PictureBox.Margin = new Padding(0, 0, 0, 2);
+            PictureBox.Margin = new Padding(0, 0, 0, 3);
             PictureBox.Name = "PictureBox";
-            PictureBox.Size = new Size(200, 150);
+            PictureBox.Size = new Size(286, 250);
             PictureBox.SizeMode = PictureBoxSizeMode.Zoom;
             PictureBox.TabIndex = 0;
             PictureBox.TabStop = false;
@@ -48,26 +48,26 @@
             // 
             TextDataDiaplay.AutoEllipsis = true;
             TextDataDiaplay.AutoSize = true;
-            TextDataDiaplay.Location = new Point(0, 150);
+            TextDataDiaplay.Location = new Point(0, 250);
             TextDataDiaplay.Margin = new Padding(0);
-            TextDataDiaplay.MaximumSize = new Size(200, 0);
+            TextDataDiaplay.MaximumSize = new Size(286, 0);
             TextDataDiaplay.Name = "TextDataDiaplay";
-            TextDataDiaplay.Size = new Size(38, 15);
+            TextDataDiaplay.Size = new Size(59, 25);
             TextDataDiaplay.TabIndex = 1;
             TextDataDiaplay.Text = "label1";
             // 
             // OverlayImage
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             AutoSize = true;
             AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            ClientSize = new Size(200, 200);
+            ClientSize = new Size(286, 333);
             ControlBox = false;
             Controls.Add(TextDataDiaplay);
             Controls.Add(PictureBox);
             FormBorderStyle = FormBorderStyle.None;
-            Margin = new Padding(3, 2, 3, 2);
+            Margin = new Padding(4, 3, 4, 3);
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "OverlayImage";

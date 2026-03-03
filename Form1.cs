@@ -5,6 +5,7 @@ using System.Security;
 using System.Text.RegularExpressions;
 using System.Windows.Forms.Design;
 using System.Xml.Linq;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace metaeditor
 {
@@ -13,20 +14,309 @@ namespace metaeditor
         //Types de métadonnées (soustraire 1)
         public String[] propertyTypes = ["Bytes", "ASCII", "UInt16", "UInt32", "UInt32 Fraction", "Any", "Int32", "", "", "Int32 Fraction"];
 
+        //ID métadonnées
+        public Dictionary<Int32, String> propertyIds = new()
+        {
+            { 0x0000, "GpsVer" },
+            { 0x0001, "GpsLatitudeRef" },
+            { 0x0002, "GpsLatitude" },
+            { 0x0003, "GpsLongitudeRef" },
+            { 0x0004, "GpsLongitude" },
+            { 0x0005, "GpsAltitudeRef" },
+            { 0x0006, "GpsAltitude" },
+            { 0x0007, "GpsGpsTime" },
+            { 0x0008, "GpsGpsSatellites" },
+            { 0x0009, "GpsGpsStatus" },
+            { 0x000A, "GpsGpsMeasureMode" },
+            { 0x000B, "GpsGpsDop" },
+            { 0x000C, "GpsSpeedRef" },
+            { 0x000D, "GpsSpeed" },
+            { 0x000E, "GpsTrackRef" },
+            { 0x000F, "GpsTrack" },
+            { 0x0010, "GpsImgDirRef" },
+            { 0x0011, "GpsImgDir" },
+            { 0x0012, "GpsMapDatum" },
+            { 0x0013, "GpsDestLatRef" },
+            { 0x0014, "GpsDestLat" },
+            { 0x0015, "GpsDestLongRef" },
+            { 0x0016, "GpsDestLong" },
+            { 0x0017, "GpsDestBearRef" },
+            { 0x0018, "GpsDestBear" },
+            { 0x0019, "GpsDestDistRef" },
+            { 0x001A, "GpsDestDist" },
+
+            { 0x001D, "29" },
+            
+            { 0x00FE, "NewSubfileType" },
+            { 0x00FF, "SubfileType" },
+            { 0x0100, "ImageWidth" },
+            { 0x0101, "ImageHeight" },
+            { 0x0102, "BitsPerSample" },
+            { 0x0103, "TagCompression" },
+            
+            { 0x0106, "PhotometricInterp" },
+            { 0x0107, "ThreshHolding" },
+            { 0x0108, "CellWidth" },
+            { 0x0109, "CellHeight" },
+            { 0x010A, "FillOrder" },
+            
+            { 0x010D, "DocumentName" },
+            { 0x010E, "ImageDescription" },
+            { 0x010F, "EquipMade" },
+            { 0x0110, "EquipModel" },
+            { 0x0111, "StripOffsets" },
+            { 0x0112, "Orientation" },
+            
+            { 0x0115, "SamplesPerPixel" },
+            { 0x0116, "RowsPerStrip" },
+            { 0x0117, "StripBytesCount" },
+            { 0x0118, "MinSampleValue" },
+            { 0x0119, "MaxSampleValue" },
+            { 0x011A, "XResolution" },
+            { 0x011B, "YResolution" },
+            { 0x011C, "PlanarConfig" },
+            { 0x011D, "PageName" },
+            { 0x011E, "XPosition" },
+            { 0x011F, "YPosition" },
+            { 0x0120, "FreeOffset" },
+            { 0x0121, "FreeByteCounts" },
+            { 0x0122, "GrayResponseUnit" },
+            { 0x0123, "GrayResponseCurve" },
+            { 0x0124, "T4Option" },
+            { 0x0125, "T6Option" },
+            
+            { 0x0128, "ResolutionUnit" },
+            { 0x0129, "PageNumber" },
+            
+            { 0x012D, "TranferFunction" },
+            
+            { 0x0131, "SoftwareUsed" },
+            { 0x0132, "DateTime" },
+            
+            { 0x013B, "Artist" },
+            { 0x013C, "HostComputer" },
+            { 0x013D, "Predictor" },
+            { 0x013E, "WhitePoint" },
+            { 0x013F, "PrimaryChromaticies" },
+            { 0x0140, "ColorMap" },
+            { 0x0141, "HalftoneHints" },
+            { 0x0142, "TileWidth" },
+            { 0x0143, "TileLenght" },
+            { 0x0144, "TileOffset" },
+            { 0x0145, "TileByteCounts" },
+            
+            { 0x014C, "InkSet" },
+            { 0x014D, "InkNames" },
+            { 0x014E, "NumberOfInks" },
+            
+            { 0x0150, "DotRange" },
+            { 0x0151, "TargetPrinter" },
+            { 0x0152, "ExtraSamples" },
+            { 0x0153, "SampleFormat" },
+            { 0x0154, "SMinSampleValue" },
+            { 0x0155, "SMaxSampleValue" },
+            { 0x0156, "TranferRange" },
+
+            { 0x0200, "JPEGProc" },
+            { 0x0201, "JPEGInterFormat" },
+            { 0x0202, "JPEGInterLenght" },
+            { 0x0203, "JPEGRestartInterval" },
+
+            { 0x0205, "JPEGLosslessPredictors" },
+            { 0x0206, "JPEGPointTransforms" },
+            { 0x0207, "JPEGQTables" },
+            { 0x0208, "JPEGDCTables" },
+            { 0x0209, "JPEGACTables" },
+
+            { 0x0211, "YCbCrCoefficients" },
+            { 0x0212, "YCbCrSubsampling" },
+            { 0x0213, "YCbCrPositionning" },
+            { 0x0214, "REFBlackWhite" },
+
+            { 0x0301, "TagGamma" },
+            { 0x0302, "ICCProfileDescriptor" },
+            { 0x0303, "SRGBRenderingIntent" },
+            
+            { 0x0320, "ImageTitle" },
+
+            { 0x5001, "ResolutionXUnit" },
+            { 0x5002, "ResolutionYUnit" },
+            { 0x5003, "ResolutionXLenghtUnit" },
+            { 0x5004, "ResolutionYLenghtUnit" },
+            { 0x5005, "PrintFlags" },
+            { 0x5006, "PrintFlagsVersion" },
+            { 0x5007, "PrintFlagsCrop" },
+            { 0x5008, "PrintFlagsBleedWith" },
+            { 0x5009, "PrintFlagsBleedWidthScale" },
+            { 0x500A, "HalftoneLPI" },
+            { 0x500B, "HalftoneLPIUnit" },
+            { 0x500C, "HalftoneDegree" },
+            { 0x500D, "HalftoneShape" },
+            { 0x500E, "HaltoneMisc" },
+            { 0x500F, "HalftoneScreen" },
+            { 0x5010, "JPEGQuality" },
+            { 0x5011, "GridSize" },
+            { 0x5012, "ThumbnailFormat" },
+            { 0x5013, "ThumbnailWidth" },
+            { 0x5014, "ThumbnailHeight" },
+            { 0x5015, "ThumbnailColorDepth" },
+            { 0x5016, "ThumbnailPlanes" },
+            { 0x5017, "ThumbnailRawBytes" },
+            { 0x5018, "ThumbnailSize" },
+            { 0x5019, "ThumbnailCompressedSize" },
+            { 0x501A, "ColorTransferFunction" },
+            { 0x501B, "ThumbnailData" },
+
+            { 0x5020, "ThumbnailImageWidth" },
+            { 0x5021, "ThumbnailImageHeight" },
+            { 0x5022, "ThumbnailBitsPerSample" },
+            { 0x5023, "ThumbnailCompression" },
+            { 0x5024, "ThumbnailPhotometricInterp" },
+            { 0x5025, "ThumbnailImageDescription" },
+            { 0x5026, "ThumbnailEquipMake" },
+            { 0x5027, "ThumbnailEquipModel" },
+            { 0x5028, "ThumbnailStripOffsets" },
+            { 0x5029, "ThumbnailOrientation" },
+            { 0x502A, "ThumbnailSamplesPerPixel" },
+            { 0x502B, "ThumbnailRowsPerStrip" },
+            { 0x502C, "ThumbnailStripBytesCount" },
+            { 0x502D, "ThumbnailResolutionX" },
+            { 0x502E, "ThumbnailResolutionY" },
+            { 0x502F, "ThumbnailPlanarConfig" },
+            { 0x5030, "ThumbnailResolutionUnit" },
+            { 0x5031, "ThumbnailTransferFunction" },
+            { 0x5032, "ThumbnailSoftwareUsed" },
+            { 0x5033, "ThumbnailDateTime" },
+            { 0x5034, "ThumbnailArtist" },
+            { 0x5035, "ThumbnailWhitePoint" },
+            { 0x5036, "ThumbnailPrimaryChromaticies" },
+            { 0x5037, "ThumbnailYCbCrCoefficients" },
+            { 0x5038, "ThumbnailYCbCrSubsampling" },
+            { 0x5039, "ThumbnailYCbCrPositioning" },
+            { 0x503A, "ThumbnailRefBlackWhite" },
+            { 0x503B, "ThumbnailCopyRight" },
+
+            { 0x5041, "20545" },
+            { 0x5042, "20546" },
+            
+            { 0x5090, "LuminanceTable" },
+            { 0x5091, "ChrominanceTable" },
+            
+            { 0x5100, "FrameDelay" },
+            { 0x5101, "LoopCount" },
+            { 0x5102, "GlobalPalette" },
+            { 0x5103, "IndexBackground" },
+            { 0x5104, "IndexTransparent" },
+            
+            { 0x5110, "PixelUnit" },
+            { 0x5111, "PixelPerUnitX" },
+            { 0x5112, "PixelPerUnitY" },
+            { 0x5113, "PaletteHistogram" },
+
+            { 0x8298, "Copyright" },
+
+            { 0x829A, "ExifExposureTime" },
+            
+            { 0x829D, "ExifFNumber" },
+
+            { 0x8769, "ExifIFD" },
+
+            { 0x8773, "ICCProfile" },
+
+            { 0x8822, "ExifExposureProg" },
+            
+            { 0x8824, "ExifSpectralSense" },
+            { 0x8825, "GpsIFD" },
+            
+            { 0x8827, "ExifISOSpeed" },
+            { 0x8828, "ExifOECF" },
+
+            { 0x8830, "34864" },
+
+            { 0x9000, "ExifVer" },
+            
+            { 0x9003, "ExifDTOrig" },
+            { 0x9004, "ExifDTDigitized" },
+            
+            { 0x9101, "ExifCompConfig" },
+            { 0x9102, "ExifCompBPP" },
+            
+            { 0x9201, "ExifShutterSpeed" },
+            { 0x9202, "ExifAperture" },
+            { 0x9203, "ExifBrightness" },
+            { 0x9204, "ExifExposureBias" },
+            { 0x9205, "ExifMaxAperture" },
+            { 0x9206, "ExifSubjectDist" },
+            { 0x9207, "ExifMeteringMode" },
+            { 0x9208, "ExifLightSource" },
+            { 0x9209, "ExifFlash" },
+            { 0x920A, "ExifFocalLenght" },
+            
+            { 0x927C, "ExifMakerMode" },
+
+            { 0x9286, "ExifUserComment" },
+            { 0x9290, "ExifDTSubsec" },
+            { 0x9291, "ExifDTOrigSS" },
+            { 0x9292, "ExifDTDigSS" },
+            
+            { 0xA000, "ExifFPXVer" },
+            { 0xA001, "ExifColorSpace" },
+            { 0xA002, "ExifPixXDim" },
+            { 0xA003, "ExifPixYDim" },
+            { 0xA004, "ExifRelatedWav" },
+            { 0xA005, "ExifInterop" },
+            
+            { 0xA20B, "ExifFlashEnergy" },
+            { 0xA20C, "ExifSpacialFR" },
+            
+            { 0xA20E, "ExifFocalXRes" },
+            { 0xA20F, "ExifFocalYRes" },
+            { 0xA210, "ExifFocalResUnit" },
+            
+            { 0xA214, "ExifSubjectLoc" },
+            { 0xA215, "ExifExposureIndex" },
+            
+            { 0xA217, "ExifSensingMethod" },
+
+            { 0xA300, "ExifFileSource" },
+            { 0xA301, "ExifSceneType" },
+            { 0xA302, "ExifCfaPattern" },
+
+            { 0xA401, "41985" },
+            { 0xA402, "41986" },
+            { 0xA403, "41987" },
+            { 0xA404, "41988" },
+            { 0xA405, "41989" },
+            { 0xA406, "41990" },
+            { 0xA407, "41991" },
+            { 0xA408, "41992" },
+            { 0xA409, "41993" },
+            { 0xA40A, "41994" },
+            { 0xA40B, "41995" },
+            { 0xA40C, "41996" }
+        };
+
         //Creation de la fenetre pour affichage MouseMove
         private readonly OverlayImage _previewForm;
         //Mise en place d'une sécurité pour éviter d'afficher en continu pour MouseMove
-        ListViewItem? _lastItem = null;
+        private ListViewItem? _lastItem;
+
+        private int _PropertyEditorNb;
+        private List<int> _displayedIds;
 
         public MetaEditor()
         {
             InitializeComponent();
             _previewForm = new OverlayImage(this);
+
+            _lastItem = null;
+            _PropertyEditorNb = 0;
+            _displayedIds = [];
         }
 
         private void ApplyButton_Click(object sender, EventArgs e)
         {
-
+            
         }
 
         private void SelPathButton_Click(object sender, EventArgs e)
@@ -63,8 +353,8 @@ namespace metaeditor
                     // Images du dossier A TESTER
                     foreach (string file in Directory.GetFiles(path))
                     {
-                        string ext = Path.GetExtension(file).ToLower(); // avoir les extensions en minuscule exemple : au lieu de .PNG on aura .png
-                        if (!imageExtensions.Contains(ext)) //test si le fichier n'est pas une image, on peut l'enlever si non nécessaire
+                        string ext = Path.GetExtension(file).ToLower(); // passer les estension en minuscule pour une meilleur détection
+                        if (!imageExtensions.Contains(ext)) //test si le fichier n'est pas une image, on l'ignore
                         {
                             continue;
                         }
@@ -74,8 +364,8 @@ namespace metaeditor
                             //using (Image img = Image.FromFile(file)) dimensions = $"{img.Width}x{img.Height}"; //Dimension de l'icone
                         }
                         catch { }*/
-                        //Mise en place de la ListView
-                        ListViewItem item = new ListViewItem(Path.GetFileName(file));
+                        //Mise en place du ListView
+                        ListViewItem item = new(Path.GetFileName(file));
                         item.SubItems.Add(dimensions);
                         item.SubItems.Add(groupName);
                         item.SubItems.Add("Preview ..."); //futur nom
@@ -146,19 +436,24 @@ namespace metaeditor
             if (item != null)
             {
                 //On recharge si on change d'item
-                if (item != _lastItem)
+                if (item != _lastItem && item.Tag != null)
                 {
                     _lastItem = item;
-                    string ImagePath = item.Tag.ToString(); //Chemin complet stocker dans l'image
+                    string? ImagePath = item.Tag.ToString(); //Chemin complet stocker dans l'image
                     if (File.Exists(ImagePath))
                     {
-                        _previewForm.SetImage(ImagePath);
+                        _previewForm.SetImage(ImagePath, _displayedIds);
                         //previewForm.Size = new Size(300, 300);
                         _previewForm.Show();
                     }
                     //Afficher la fenêtre a une position décalée par raport au souris
                     _previewForm.Location = new Point(Cursor.Position.X + 15, Cursor.Position.Y + 15);
                 }
+            }
+            else
+            {
+                _previewForm.Hide();
+                _lastItem = null;
             }
         }
 
@@ -169,7 +464,8 @@ namespace metaeditor
         }
         private void AddPropertyEditorButton_Click(object sender, EventArgs e)
         {
-            new PropertyEditor(PropertyListPanel);
+            new PropertyEditor(PropertyListPanel, propertyIds, CurrentAutoScaleDimensions.Width, _PropertyEditorNb, _displayedIds);
+            _PropertyEditorNb++;
         }
 
         public class PropertyEditor
@@ -179,10 +475,18 @@ namespace metaeditor
             private System.Windows.Forms.Button m_close;
             private System.Windows.Forms.ComboBox m_comboBox;
             private System.Windows.Forms.FlowLayoutPanel m_PropertyListPanel;
+            private int m_Id;
+            private List<int> m_displayedIds;
+            private Dictionary<Int32, String> m_propertyIds;
 
-            public PropertyEditor(System.Windows.Forms.FlowLayoutPanel PropertyListPanel)
+            public PropertyEditor(System.Windows.Forms.FlowLayoutPanel PropertyListPanel, Dictionary<Int32, String> propertyIds, float CurrentAutoScaleDimensionsWidth, int PropertyEditorId, List<int> displayedIds)
             {
                 m_PropertyListPanel = PropertyListPanel;
+                m_Id = (int)PropertyEditorId;
+                m_displayedIds = displayedIds;
+                m_propertyIds = propertyIds;
+
+                m_displayedIds.Add(0);
 
                 m_panel = new Panel();
                 m_textBox = new System.Windows.Forms.TextBox();
@@ -190,6 +494,8 @@ namespace metaeditor
                 m_comboBox = new System.Windows.Forms.ComboBox();
 
                 m_PropertyListPanel.Controls.Add(m_panel);
+
+                int margin = 3, size = (int)(CurrentAutoScaleDimensionsWidth * 3.5), width = 300;
 
                 // 
                 // panel1
@@ -200,44 +506,58 @@ namespace metaeditor
                 m_panel.Controls.Add(m_comboBox);
                 m_panel.Location = new Point(3, 3);
                 m_panel.Name = "panel1";
-                m_panel.Size = new Size(300, 55);
+                m_panel.Size = new Size(width, 2 * size + 4 * margin);
                 m_panel.TabIndex = 0;
                 // 
                 // close
                 // 
                 //m_close.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-                m_close.Location = new Point(274, 3);
+                m_close.Location = new Point(width - margin - size, margin);
                 m_close.Name = "close";
-                m_close.Size = new Size(23, 23);
+                m_close.Size = new Size(size, size);
                 m_close.TabIndex = 1;
                 m_close.Text = "x";
                 m_close.UseVisualStyleBackColor = true;
-                m_close.Click += m_close_Click;
+                m_close.Click += Close_Click;
                 // 
                 // comboBox1
                 // 
-                m_comboBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+                //m_comboBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
                 m_comboBox.FormattingEnabled = true;
-                m_comboBox.Location = new Point(3, 3);
+                m_comboBox.Location = new Point(margin, margin);
                 m_comboBox.Name = "comboBox1";
-                m_comboBox.Size = new Size(268, 23);
+                m_comboBox.Size = new Size(width - 3 * margin - size, size);
                 m_comboBox.TabIndex = 0;
+                m_comboBox.DataSource = new BindingSource(m_propertyIds, "");
+                m_comboBox.DisplayMember = "Value";
+                m_comboBox.ValueMember = "Key";
+                m_comboBox.SelectedIndexChanged += ComboBox_SelectedIndexChanged;
                 // 
                 // textBox1
                 // 
-                m_textBox.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-                m_textBox.Location = new Point(3, 29);
+                //m_textBox.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+                m_textBox.Location = new Point(margin, size + 2 * margin);
                 m_textBox.Name = "textBox1";
-                m_textBox.Size = new Size(294, 23);
+                m_textBox.Size = new Size(width - 2 * margin, size);
                 m_textBox.TabIndex = 2;
             }
 
-            private void m_close_Click(object sender, EventArgs e)
+            private void Close_Click(object? sender, EventArgs e)
             {
                 m_PropertyListPanel.Controls.Remove(m_panel);
                 m_panel.Controls.Remove(m_textBox);
                 m_panel.Controls.Remove(m_close);
                 m_panel.Controls.Remove(m_comboBox);
+                m_displayedIds[m_Id] = 100000;
+            }
+
+            private void ComboBox_SelectedIndexChanged(object? sender, EventArgs e)
+            {
+                if(m_comboBox.SelectedItem != null)
+                {
+                    KeyValuePair<int, string> kvp = (KeyValuePair<int, string>)m_comboBox.SelectedItem;
+                    m_displayedIds[m_Id] = kvp.Key;
+                }
             }
         }
     }
