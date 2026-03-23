@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Specialized;
+using System.DirectoryServices;
+using System.Net;
 using System.Reflection.Metadata;
 using System.Security;
 using System.Text.RegularExpressions;
@@ -11,11 +13,32 @@ namespace metaeditor
 {
     public partial class MetaEditor : Form
     {
+        //Déclaration du dictionnaire de variable à "$"
+        private readonly Dictionary<string, Func<string, string, string>> handlers;
+
+        public MetaEditor()
+        {
+            InitializeComponent();
+            _previewForm = new OverlayImage(this);
+
+            _lastItem = null;
+            _PropertyEditorNb = 0;
+            _displayedIds = [];
+            _NewValue = [];
+
+            //Définition du dictionnaire de variable à "$"
+            handlers = new Dictionary<string, Func<string, string, string>>
+            {
+                { "FOLDER", HandleFolder},
+                { "DATE", HandleDate },
+            };
+        }
+
         //Types de métadonnées (soustraire 1)
         public String[] propertyTypes = ["Bytes", "ASCII", "UInt16", "UInt32", "UInt32 Fraction", "Any", "Int32", "", "", "Int32 Fraction"];
 
         //ID métadonnées
-        public Dictionary<Int32, String> propertyIds = new()
+        public readonly Dictionary<Int32, String> propertyIds = new()
         {
             { 0x0000, "GpsVer" },
             { 0x0001, "GpsLatitudeRef" },
@@ -46,27 +69,27 @@ namespace metaeditor
             { 0x001A, "GpsDestDist" },
 
             { 0x001D, "29" },
-            
+
             { 0x00FE, "NewSubfileType" },
             { 0x00FF, "SubfileType" },
             { 0x0100, "ImageWidth" },
             { 0x0101, "ImageHeight" },
             { 0x0102, "BitsPerSample" },
             { 0x0103, "TagCompression" },
-            
+
             { 0x0106, "PhotometricInterp" },
             { 0x0107, "ThreshHolding" },
             { 0x0108, "CellWidth" },
             { 0x0109, "CellHeight" },
             { 0x010A, "FillOrder" },
-            
+
             { 0x010D, "DocumentName" },
             { 0x010E, "ImageDescription" },
             { 0x010F, "EquipMade" },
             { 0x0110, "EquipModel" },
             { 0x0111, "StripOffsets" },
             { 0x0112, "Orientation" },
-            
+
             { 0x0115, "SamplesPerPixel" },
             { 0x0116, "RowsPerStrip" },
             { 0x0117, "StripBytesCount" },
@@ -84,15 +107,15 @@ namespace metaeditor
             { 0x0123, "GrayResponseCurve" },
             { 0x0124, "T4Option" },
             { 0x0125, "T6Option" },
-            
+
             { 0x0128, "ResolutionUnit" },
             { 0x0129, "PageNumber" },
-            
+
             { 0x012D, "TranferFunction" },
-            
+
             { 0x0131, "SoftwareUsed" },
             { 0x0132, "DateTime" },
-            
+
             { 0x013B, "Artist" },
             { 0x013C, "HostComputer" },
             { 0x013D, "Predictor" },
@@ -104,11 +127,11 @@ namespace metaeditor
             { 0x0143, "TileLenght" },
             { 0x0144, "TileOffset" },
             { 0x0145, "TileByteCounts" },
-            
+
             { 0x014C, "InkSet" },
             { 0x014D, "InkNames" },
             { 0x014E, "NumberOfInks" },
-            
+
             { 0x0150, "DotRange" },
             { 0x0151, "TargetPrinter" },
             { 0x0152, "ExtraSamples" },
@@ -136,7 +159,7 @@ namespace metaeditor
             { 0x0301, "TagGamma" },
             { 0x0302, "ICCProfileDescriptor" },
             { 0x0303, "SRGBRenderingIntent" },
-            
+
             { 0x0320, "ImageTitle" },
 
             { 0x5001, "ResolutionXUnit" },
@@ -198,16 +221,16 @@ namespace metaeditor
 
             { 0x5041, "20545" },
             { 0x5042, "20546" },
-            
+
             { 0x5090, "LuminanceTable" },
             { 0x5091, "ChrominanceTable" },
-            
+
             { 0x5100, "FrameDelay" },
             { 0x5101, "LoopCount" },
             { 0x5102, "GlobalPalette" },
             { 0x5103, "IndexBackground" },
             { 0x5104, "IndexTransparent" },
-            
+
             { 0x5110, "PixelUnit" },
             { 0x5111, "PixelPerUnitX" },
             { 0x5112, "PixelPerUnitY" },
@@ -216,7 +239,7 @@ namespace metaeditor
             { 0x8298, "Copyright" },
 
             { 0x829A, "ExifExposureTime" },
-            
+
             { 0x829D, "ExifFNumber" },
 
             { 0x8769, "ExifIFD" },
@@ -224,23 +247,23 @@ namespace metaeditor
             { 0x8773, "ICCProfile" },
 
             { 0x8822, "ExifExposureProg" },
-            
+
             { 0x8824, "ExifSpectralSense" },
             { 0x8825, "GpsIFD" },
-            
+
             { 0x8827, "ExifISOSpeed" },
             { 0x8828, "ExifOECF" },
 
             { 0x8830, "34864" },
 
             { 0x9000, "ExifVer" },
-            
+
             { 0x9003, "ExifDTOrig" },
             { 0x9004, "ExifDTDigitized" },
-            
+
             { 0x9101, "ExifCompConfig" },
             { 0x9102, "ExifCompBPP" },
-            
+
             { 0x9201, "ExifShutterSpeed" },
             { 0x9202, "ExifAperture" },
             { 0x9203, "ExifBrightness" },
@@ -251,31 +274,31 @@ namespace metaeditor
             { 0x9208, "ExifLightSource" },
             { 0x9209, "ExifFlash" },
             { 0x920A, "ExifFocalLenght" },
-            
+
             { 0x927C, "ExifMakerMode" },
 
             { 0x9286, "ExifUserComment" },
             { 0x9290, "ExifDTSubsec" },
             { 0x9291, "ExifDTOrigSS" },
             { 0x9292, "ExifDTDigSS" },
-            
+
             { 0xA000, "ExifFPXVer" },
             { 0xA001, "ExifColorSpace" },
             { 0xA002, "ExifPixXDim" },
             { 0xA003, "ExifPixYDim" },
             { 0xA004, "ExifRelatedWav" },
             { 0xA005, "ExifInterop" },
-            
+
             { 0xA20B, "ExifFlashEnergy" },
             { 0xA20C, "ExifSpacialFR" },
-            
+
             { 0xA20E, "ExifFocalXRes" },
             { 0xA20F, "ExifFocalYRes" },
             { 0xA210, "ExifFocalResUnit" },
-            
+
             { 0xA214, "ExifSubjectLoc" },
             { 0xA215, "ExifExposureIndex" },
-            
+
             { 0xA217, "ExifSensingMethod" },
 
             { 0xA300, "ExifFileSource" },
@@ -303,20 +326,71 @@ namespace metaeditor
 
         private int _PropertyEditorNb;
         private List<int> _displayedIds;
+        private List<string> _NewValue;
 
-        public MetaEditor()
+        //Fonction qui permet d'avoir le nom du dossier en fonction du niveau de la variable $FOLDER
+        private string GetFolderName(string path, int level)
         {
-            InitializeComponent();
-            _previewForm = new OverlayImage(this);
+            DirectoryInfo dir = new DirectoryInfo(path);
 
-            _lastItem = null;
-            _PropertyEditorNb = 0;
-            _displayedIds = [];
+            for (int i = 0; i < level; i++)
+            {
+                if (dir.Parent != null)
+                    dir = dir.Parent;
+                else
+                    return ""; // ou gérer autrement (racine atteinte)
+            }
+            return dir.Name;
+        }
+
+        //Cette fonction permet d'englober les noms et les variables spéciaux du "$"
+        private string ResolveValue(string input, string rootpath)
+        {
+            //Test si c'est juste du texte sans "$"
+            if (!input.StartsWith("$"))
+            {
+                return input;
+            }
+            //Ici, il y'a "$", d'abord il faut extraire le nom du token (ex: FOLDER, DATE...)
+            string token = new string(input.Skip(1).TakeWhile(char.IsLetter).ToArray()); //Le skip ne prend pas le premier caractère qui est "$", ensuite il prend les caractères qui sont des lettres et enfin il le transforme en tableau donc en un string
+            //Correspondance avec le dictionnaire
+            if (handlers.TryGetValue(token, out var handler))
+            {
+                return handler(input,rootpath);
+            }
+            //Si rien n'est fonctionnel, alors affiche une erreur dans le TextBox (à changé après les tests)
+            return "UNKNOWN_TOKEN";
+        }
+
+        //Fonction qui gère "$FOLDER" qui est assigné dans le dictionnaire
+        private string HandleFolder(string input, string rootpath)
+        {
+            string numberPart = input.Substring(7); //prend seulement les caractères après les 7 premières caractères qui sont "$FOLDER"
+            //Test si les caractères prises avec les 7 premières caractères sont un nombre
+            if (int.TryParse(numberPart, out int level))
+            {
+                return GetFolderName(rootpath, level);
+            }
+            //Si rien n'est fonctionnel, alors affiche un erreur dans le TextBox (à changer après les tests)
+            return "ERROR_FOLDER";
+        }
+
+        //Fonction qui gère "$DATE" qui est assigné dans le dictionnaire - ATTNTION ! j'ai mis input et rootpath mais je ne l'utilise pas
+        private string HandleDate(string input, string rootpath)
+        {
+            return DateTime.Now.ToString("dd-MM-yyyy");
         }
 
         private void ApplyButton_Click(object sender, EventArgs e)
         {
-            
+            /// Méthode pour appliquer les changements des propreiétés d'une ou plusieurs images
+            string rootPath = PathBox.Text; //Accès du chemin
+            if (!Directory.Exists(rootPath)) //Test pour voir s'il existe
+            {
+                return;
+            }
+            string value = _NewValue[0]; //Récuper la valeur à changer (pour l'instant le premier)
+            Test_affiche.Text = ResolveValue(value, rootPath);
         }
 
         private void SelPathButton_Click(object sender, EventArgs e)
@@ -464,8 +538,8 @@ namespace metaeditor
         }
         private void AddPropertyEditorButton_Click(object sender, EventArgs e)
         {
-            new PropertyEditor(PropertyListPanel, propertyIds, CurrentAutoScaleDimensions.Width, _PropertyEditorNb, _displayedIds);
-            _PropertyEditorNb++;
+            new PropertyEditor(PropertyListPanel, propertyIds, CurrentAutoScaleDimensions.Width, _PropertyEditorNb, _displayedIds, _NewValue);
+            _PropertyEditorNb++;    
         }
 
         public class PropertyEditor
@@ -477,16 +551,19 @@ namespace metaeditor
             private System.Windows.Forms.FlowLayoutPanel m_PropertyListPanel;
             private int m_Id;
             private List<int> m_displayedIds;
+            private List<string> m_NewValue;
             private Dictionary<Int32, String> m_propertyIds;
 
-            public PropertyEditor(System.Windows.Forms.FlowLayoutPanel PropertyListPanel, Dictionary<Int32, String> propertyIds, float CurrentAutoScaleDimensionsWidth, int PropertyEditorId, List<int> displayedIds)
+            public PropertyEditor(System.Windows.Forms.FlowLayoutPanel PropertyListPanel, Dictionary<Int32, String> propertyIds, float CurrentAutoScaleDimensionsWidth, int PropertyEditorId, List<int> displayedIds, List<string> NewValue)
             {
                 m_PropertyListPanel = PropertyListPanel;
                 m_Id = (int)PropertyEditorId;
                 m_displayedIds = displayedIds;
                 m_propertyIds = propertyIds;
+                m_NewValue = NewValue;
 
                 m_displayedIds.Add(0);
+                m_NewValue.Add("");
 
                 m_panel = new Panel();
                 m_textBox = new System.Windows.Forms.TextBox();
@@ -540,6 +617,7 @@ namespace metaeditor
                 m_textBox.Name = "textBox1";
                 m_textBox.Size = new Size(width - 2 * margin, size);
                 m_textBox.TabIndex = 2;
+                m_textBox.TextChanged += TextBox_TextChanged;
             }
 
             private void Close_Click(object? sender, EventArgs e)
@@ -549,14 +627,35 @@ namespace metaeditor
                 m_panel.Controls.Remove(m_close);
                 m_panel.Controls.Remove(m_comboBox);
                 m_displayedIds[m_Id] = 100000;
+                m_NewValue[m_Id] = "";
             }
 
             private void ComboBox_SelectedIndexChanged(object? sender, EventArgs e)
             {
-                if(m_comboBox.SelectedItem != null)
+                if (m_comboBox.SelectedItem != null)
                 {
                     KeyValuePair<int, string> kvp = (KeyValuePair<int, string>)m_comboBox.SelectedItem;
                     m_displayedIds[m_Id] = kvp.Key;
+                }
+            }
+
+            //Fonction qui détecte les noms spéciaux après le symbole "$" en utilisant du Regex
+            private bool IsValidVariable(string input)
+            {
+                return Regex.IsMatch(input, @"^\$(FOLDER\d+|DATE)$"); //Ajouter d'autre nom en fonction de notre besoin
+            }
+
+            private void TextBox_TextChanged(object? sender, EventArgs e)
+            {
+                m_NewValue[m_Id] = m_textBox.Text;
+                string selection = m_textBox.Text;
+                if(IsValidVariable(selection))
+                {
+                    m_textBox.ForeColor = Color.Green;
+                }
+                else
+                {
+                    m_textBox.ForeColor = Color.Blue;
                 }
             }
         }
