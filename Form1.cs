@@ -9,12 +9,27 @@ using System.Windows.Forms.Design;
 using System.Xml.Linq;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
+
 namespace metaeditor
 {
+
+    struct PropertyItem
+    {
+       
+    }
     public partial class MetaEditor : Form
     {
         //Déclaration du dictionnaire de variable à "$"
         private readonly Dictionary<string, Func<string, string, string>> handlers;
+
+        //Creation de la fenetre pour affichage MouseMove
+        private readonly OverlayImage _previewForm;
+        //Mise en place d'une sécurité pour éviter d'afficher en continu pour MouseMove
+        private ListViewItem? _lastItem;
+
+        private int _PropertyEditorNb;
+        private List<int> _displayedIds;
+        private List<string> _NewValue;
 
         public MetaEditor()
         {
@@ -31,6 +46,8 @@ namespace metaeditor
             {
                 { "FOLDER", HandleFolder},
                 { "DATE", HandleDate },
+                { "FILENAME", HandleFilename },
+                { "PROPERTY", HandleProperty }
             };
         }
 
@@ -319,14 +336,48 @@ namespace metaeditor
             { 0xA40C, "41996" }
         };
 
-        //Creation de la fenetre pour affichage MouseMove
-        private readonly OverlayImage _previewForm;
-        //Mise en place d'une sécurité pour éviter d'afficher en continu pour MouseMove
-        private ListViewItem? _lastItem;
+        public static String DecodeProperty(System.Drawing.Imaging.PropertyItem? property)
+        {
+            if (property != null && property.Value != null)
+            {
+                switch (property.Type)
+                {
+                    case 2:
+                        return System.Text.Encoding.UTF8.GetString(property.Value, 0, property.Len - 1) + "\n";
 
-        private int _PropertyEditorNb;
-        private List<int> _displayedIds;
-        private List<string> _NewValue;
+                    case 3:
+                        UInt16[] val_uint16 = new UInt16[property.Len / 2];
+                        for (int j = 0; j < property.Len / 2; j++)
+                        {
+                            byte[] val = { property.Value[2 * j], property.Value[2 * j + 1] };
+                            val_uint16[j] = BitConverter.ToUInt16(val);
+                        }
+                        return String.Join("-", val_uint16) + "\n";
+
+                    case 4:
+                        UInt32[] val_uint32 = new UInt32[property.Len / 2];
+                        for (int j = 0; j < property.Len / 4; j++)
+                        {
+                            byte[] val = { property.Value[4 * j], property.Value[4 * j + 1], property.Value[4 * j + 2], property.Value[4 * j + 3] };
+                            val_uint32[j] = BitConverter.ToUInt32(val);
+                        }
+                        return String.Join("-", val_uint32) + "\n";
+
+                    case 7:
+                        Int32[] val_int32 = new Int32[property.Len / 2];
+                        for (int j = 0; j < property.Len / 4; j++)
+                        {
+                            byte[] val = { property.Value[4 * j], property.Value[4 * j + 1], property.Value[4 * j + 2], property.Value[4 * j + 3] };
+                            val_int32[j] = BitConverter.ToInt32(val);
+                        }
+                        return String.Join("-", val_int32) + "\n";
+
+                    default:
+                        return " \n";
+                }
+            }
+            return "";
+        }
 
         //Fonction qui permet d'avoir le nom du dossier en fonction du niveau de la variable $FOLDER
         private string GetFolderName(string path, int level)
@@ -344,7 +395,7 @@ namespace metaeditor
         }
 
         //Cette fonction permet d'englober les noms et les variables spéciaux du "$"
-        private string ResolveValue(string input, string rootpath)
+        private string ResolveValue(string input, string imgpath)
         {
             //Test si c'est juste du texte sans "$"
             if (!input.StartsWith("$"))
@@ -356,41 +407,63 @@ namespace metaeditor
             //Correspondance avec le dictionnaire
             if (handlers.TryGetValue(token, out var handler))
             {
-                return handler(input,rootpath);
+                return handler(input,imgpath);
             }
             //Si rien n'est fonctionnel, alors affiche une erreur dans le TextBox (à changé après les tests)
             return "UNKNOWN_TOKEN";
         }
 
         //Fonction qui gère "$FOLDER" qui est assigné dans le dictionnaire
-        private string HandleFolder(string input, string rootpath)
+        private string HandleFolder(string input, string imgpath)
         {
             string numberPart = input.Substring(7); //prend seulement les caractères après les 7 premières caractères qui sont "$FOLDER"
             //Test si les caractères prises avec les 7 premières caractères sont un nombre
             if (int.TryParse(numberPart, out int level))
             {
-                return GetFolderName(rootpath, level);
+                return GetFolderName(imgpath, level+1);
             }
             //Si rien n'est fonctionnel, alors affiche un erreur dans le TextBox (à changer après les tests)
             return "ERROR_FOLDER";
         }
 
-        //Fonction qui gère "$DATE" qui est assigné dans le dictionnaire - ATTNTION ! j'ai mis input et rootpath mais je ne l'utilise pas
-        private string HandleDate(string input, string rootpath)
+        //Fonction qui gère "$DATE" qui est assigné dans le dictionnaire - ATTENTION ! j'ai mis input et rootpath mais je ne l'utilise pas
+        private string HandleDate(string input, string imgpath)
         {
             return DateTime.Now.ToString("dd-MM-yyyy");
+        }
+
+        //Fonction qui gère "$FILENAME" qui est assigné dans le dictionnaire - ATTENTION ! j'ai mis input mais je ne l'utilise pas
+        private string HandleFilename(string input, string imgpath)
+        {
+            return Path.GetFileName(imgpath);
+        }
+
+        private string HandleProperty(string input, string imgpath)
+        {
+            string propertyIdstr = input.Substring(9); //prend seulement les caractères après les 9 premières caractères qui sont "$PROPERTY"
+
+            //Test si les caractères prises avec les 9 premières caractères sont un nombre
+            if (int.TryParse(propertyIdstr, out int propertyId))
+            {
+                Image image = Image.FromFile(imgpath);
+                if (image.PropertyIdList.Contains(propertyId))
+                {
+                    return DecodeProperty(image.GetPropertyItem(propertyId));
+                }
+                return "ERROR_PROPERTY";
+            }
+            //Si rien n'est fonctionnel, alors affiche un erreur dans le TextBox (à changer après les tests)
+            return "ERROR_PROPERTY";
         }
 
         private void ApplyButton_Click(object sender, EventArgs e)
         {
             /// Méthode pour appliquer les changements des propreiétés d'une ou plusieurs images
-            string rootPath = PathBox.Text; //Accès du chemin
-            if (!Directory.Exists(rootPath)) //Test pour voir s'il existe
+            if(FilesView.Items[0].Tag != null)
             {
-                return;
+                string value = _NewValue[0]; //Récuper la valeur à changer (pour l'instant le premier)
+                Test_affiche.Text = ResolveValue(value, FilesView.Items[0].Tag.ToString());
             }
-            string value = _NewValue[0]; //Récuper la valeur à changer (pour l'instant le premier)
-            Test_affiche.Text = ResolveValue(value, rootPath);
         }
 
         private void SelPathButton_Click(object sender, EventArgs e)
@@ -490,8 +563,8 @@ namespace metaeditor
                     FileName = FileName.ToLower();
                     FileName = FileName.Replace(" ", string.Empty);
                 }
-
-                if ((FileName.Contains(selection) && !UseRegex.Checked))
+            
+                if ((FileName.Contains(selection) && !UseRegex.Checked) || (Regex.IsMatch(FileName, '@'+selection) && UseRegex.Checked))
                 {
                     item.ForeColor = Color.Green;
                 }
@@ -550,14 +623,14 @@ namespace metaeditor
             private System.Windows.Forms.ComboBox m_comboBox;
             private System.Windows.Forms.FlowLayoutPanel m_PropertyListPanel;
             private int m_Id;
-            private List<int> m_displayedIds;
-            private List<string> m_NewValue;
-            private Dictionary<Int32, String> m_propertyIds;
+            private readonly List<int> m_displayedIds;
+            private readonly List<string> m_NewValue;
+            private readonly Dictionary<Int32, String> m_propertyIds;
 
             public PropertyEditor(System.Windows.Forms.FlowLayoutPanel PropertyListPanel, Dictionary<Int32, String> propertyIds, float CurrentAutoScaleDimensionsWidth, int PropertyEditorId, List<int> displayedIds, List<string> NewValue)
             {
                 m_PropertyListPanel = PropertyListPanel;
-                m_Id = (int)PropertyEditorId;
+                m_Id = PropertyEditorId;
                 m_displayedIds = displayedIds;
                 m_propertyIds = propertyIds;
                 m_NewValue = NewValue;
@@ -596,9 +669,9 @@ namespace metaeditor
                 m_close.Text = "x";
                 m_close.UseVisualStyleBackColor = true;
                 m_close.Click += Close_Click;
-                // 
+                //
                 // comboBox1
-                // 
+                //
                 //m_comboBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
                 m_comboBox.FormattingEnabled = true;
                 m_comboBox.Location = new Point(margin, margin);
@@ -609,9 +682,9 @@ namespace metaeditor
                 m_comboBox.DisplayMember = "Value";
                 m_comboBox.ValueMember = "Key";
                 m_comboBox.SelectedIndexChanged += ComboBox_SelectedIndexChanged;
-                // 
+                //
                 // textBox1
-                // 
+                //
                 //m_textBox.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
                 m_textBox.Location = new Point(margin, size + 2 * margin);
                 m_textBox.Name = "textBox1";
@@ -633,29 +706,30 @@ namespace metaeditor
             private void ComboBox_SelectedIndexChanged(object? sender, EventArgs e)
             {
                 if (m_comboBox.SelectedItem != null)
-                {
-                    KeyValuePair<int, string> kvp = (KeyValuePair<int, string>)m_comboBox.SelectedItem;
-                    m_displayedIds[m_Id] = kvp.Key;
-                }
+                    m_displayedIds[m_Id] = ((KeyValuePair<int, string>)m_comboBox.SelectedItem).Key;
             }
 
             //Fonction qui détecte les noms spéciaux après le symbole "$" en utilisant du Regex
             private bool IsValidVariable(string input)
             {
-                return Regex.IsMatch(input, @"^\$(FOLDER\d+|DATE)$"); //Ajouter d'autre nom en fonction de notre besoin
+                return Regex.IsMatch(input, @"^\$(FOLDER\d+|DATE|FILENAME|PROPERTY\d+)$"); //Ajouter d'autre nom en fonction de notre besoin
             }
 
             private void TextBox_TextChanged(object? sender, EventArgs e)
             {
                 m_NewValue[m_Id] = m_textBox.Text;
                 string selection = m_textBox.Text;
-                if(IsValidVariable(selection))
+                if (!selection.Contains("$"))
+                {
+                    m_textBox.ForeColor = Color.Black;
+                }
+                else if(IsValidVariable(selection))
                 {
                     m_textBox.ForeColor = Color.Green;
                 }
                 else
                 {
-                    m_textBox.ForeColor = Color.Blue;
+                    m_textBox.ForeColor = Color.Red;
                 }
             }
         }
