@@ -44,7 +44,7 @@ namespace metaeditor
             //Définition du dictionnaire de variable à "$"
             handlers = new Dictionary<string, Func<string, string, string>>
             {
-                { "FOLDER", HandleFolder},
+                { "FOLDER", HandleFolder },
                 { "DATE", HandleDate },
                 { "FILENAME", HandleFilename },
                 { "PROPERTY", HandleProperty }
@@ -59,11 +59,11 @@ namespace metaeditor
         {
             { 0x0000, "GpsVer" },
             { 0x0001, "GpsLatitudeRef" },
-            { 0x0002, "GpsLatitude" },
+            { 0x0002, "GpsLatitude" },          //
             { 0x0003, "GpsLongitudeRef" },
-            { 0x0004, "GpsLongitude" },
+            { 0x0004, "GpsLongitude" },         //
             { 0x0005, "GpsAltitudeRef" },
-            { 0x0006, "GpsAltitude" },
+            { 0x0006, "GpsAltitude" },          //
             { 0x0007, "GpsGpsTime" },
             { 0x0008, "GpsGpsSatellites" },
             { 0x0009, "GpsGpsStatus" },
@@ -100,10 +100,10 @@ namespace metaeditor
             { 0x0109, "CellHeight" },
             { 0x010A, "FillOrder" },
 
-            { 0x010D, "DocumentName" },
-            { 0x010E, "ImageDescription" },
-            { 0x010F, "EquipMade" },
-            { 0x0110, "EquipModel" },
+            { 0x010D, "DocumentName" },         //
+            { 0x010E, "ImageDescription" },     //
+            { 0x010F, "EquipMade" },            //
+            { 0x0110, "EquipModel" },           //
             { 0x0111, "StripOffsets" },
             { 0x0112, "Orientation" },
 
@@ -130,11 +130,11 @@ namespace metaeditor
 
             { 0x012D, "TranferFunction" },
 
-            { 0x0131, "SoftwareUsed" },
-            { 0x0132, "DateTime" },
+            { 0x0131, "SoftwareUsed" },         //
+            { 0x0132, "DateTime" },             //
 
-            { 0x013B, "Artist" },
-            { 0x013C, "HostComputer" },
+            { 0x013B, "Artist" },               //
+            { 0x013C, "HostComputer" },         //
             { 0x013D, "Predictor" },
             { 0x013E, "WhitePoint" },
             { 0x013F, "PrimaryChromaticies" },
@@ -177,7 +177,7 @@ namespace metaeditor
             { 0x0302, "ICCProfileDescriptor" },
             { 0x0303, "SRGBRenderingIntent" },
 
-            { 0x0320, "ImageTitle" },
+            { 0x0320, "ImageTitle" },               //
 
             { 0x5001, "ResolutionXUnit" },
             { 0x5002, "ResolutionYUnit" },
@@ -213,8 +213,8 @@ namespace metaeditor
             { 0x5023, "ThumbnailCompression" },
             { 0x5024, "ThumbnailPhotometricInterp" },
             { 0x5025, "ThumbnailImageDescription" },
-            { 0x5026, "ThumbnailEquipMake" },
-            { 0x5027, "ThumbnailEquipModel" },
+            { 0x5026, "ThumbnailEquipMake" },               //
+            { 0x5027, "ThumbnailEquipModel" },              //
             { 0x5028, "ThumbnailStripOffsets" },
             { 0x5029, "ThumbnailOrientation" },
             { 0x502A, "ThumbnailSamplesPerPixel" },
@@ -226,15 +226,15 @@ namespace metaeditor
             { 0x5030, "ThumbnailResolutionUnit" },
             { 0x5031, "ThumbnailTransferFunction" },
             { 0x5032, "ThumbnailSoftwareUsed" },
-            { 0x5033, "ThumbnailDateTime" },
-            { 0x5034, "ThumbnailArtist" },
+            { 0x5033, "ThumbnailDateTime" },                //
+            { 0x5034, "ThumbnailArtist" },                  //
             { 0x5035, "ThumbnailWhitePoint" },
             { 0x5036, "ThumbnailPrimaryChromaticies" },
             { 0x5037, "ThumbnailYCbCrCoefficients" },
             { 0x5038, "ThumbnailYCbCrSubsampling" },
             { 0x5039, "ThumbnailYCbCrPositioning" },
             { 0x503A, "ThumbnailRefBlackWhite" },
-            { 0x503B, "ThumbnailCopyRight" },
+            { 0x503B, "ThumbnailCopyRight" },               //
 
             { 0x5041, "20545" },
             { 0x5042, "20546" },
@@ -253,7 +253,7 @@ namespace metaeditor
             { 0x5112, "PixelPerUnitY" },
             { 0x5113, "PaletteHistogram" },
 
-            { 0x8298, "Copyright" },
+            { 0x8298, "Copyright" },                        //
 
             { 0x829A, "ExifExposureTime" },
 
@@ -268,7 +268,7 @@ namespace metaeditor
             { 0x8824, "ExifSpectralSense" },
             { 0x8825, "GpsIFD" },
 
-            { 0x8827, "ExifISOSpeed" },
+            { 0x8827, "ExifISOSpeed" },                     //
             { 0x8828, "ExifOECF" },
 
             { 0x8830, "34864" },
@@ -281,20 +281,20 @@ namespace metaeditor
             { 0x9101, "ExifCompConfig" },
             { 0x9102, "ExifCompBPP" },
 
-            { 0x9201, "ExifShutterSpeed" },
-            { 0x9202, "ExifAperture" },
-            { 0x9203, "ExifBrightness" },
-            { 0x9204, "ExifExposureBias" },
-            { 0x9205, "ExifMaxAperture" },
-            { 0x9206, "ExifSubjectDist" },
-            { 0x9207, "ExifMeteringMode" },
-            { 0x9208, "ExifLightSource" },
-            { 0x9209, "ExifFlash" },
-            { 0x920A, "ExifFocalLenght" },
+            { 0x9201, "ExifShutterSpeed" },                 //
+            { 0x9202, "ExifAperture" },                     //
+            { 0x9203, "ExifBrightness" },                   //
+            { 0x9204, "ExifExposureBias" },                 //
+            { 0x9205, "ExifMaxAperture" },                  //
+            { 0x9206, "ExifSubjectDist" },                  //
+            { 0x9207, "ExifMeteringMode" },                 //
+            { 0x9208, "ExifLightSource" },                  //
+            { 0x9209, "ExifFlash" },                        //
+            { 0x920A, "ExifFocalLenght" },                  //
 
             { 0x927C, "ExifMakerMode" },
 
-            { 0x9286, "ExifUserComment" },
+            { 0x9286, "ExifUserComment" },                  //
             { 0x9290, "ExifDTSubsec" },
             { 0x9291, "ExifDTOrigSS" },
             { 0x9292, "ExifDTDigSS" },
@@ -438,6 +438,7 @@ namespace metaeditor
             return Path.GetFileName(imgpath);
         }
 
+        //Fonction qui gère "$PROPERTY" qui est assigné dans le dictionnaire
         private string HandleProperty(string input, string imgpath)
         {
             string propertyIdstr = input.Substring(9); //prend seulement les caractères après les 9 premières caractères qui sont "$PROPERTY"
@@ -458,6 +459,7 @@ namespace metaeditor
 
         private void ApplyButton_Click(object sender, EventArgs e)
         {
+
             /// Méthode pour appliquer les changements des propreiétés d'une ou plusieurs images
             if(FilesView.Items[0].Tag != null)
             {
