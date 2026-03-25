@@ -459,7 +459,23 @@ namespace metaeditor
 
         private void ApplyButton_Click(object sender, EventArgs e)
         {
-
+            //Parcours des items
+            foreach (ListViewItem item in FilesView.Items)
+            { 
+                //Test pour vérifier s'ils sont verts (c'est seulement les verts qui faut changer)
+                if(item.ForeColor == Color.Green)
+                {
+                    //Parcours de displayedID et NewValue pour pouvoir les appliqués
+                    for(int i = 0; i < _PropertyEditorNb; i++)
+                    {
+                        //Test pour vérifier qu'il est bien présent dans le dictonnaire
+                        if (propertyIds.TryGetValue(_displayedIds[i], out string a))
+                        {
+                            //Appel du fonction EncodeProperty
+                        }
+                    }
+                }
+            }
             /// Méthode pour appliquer les changements des propreiétés d'une ou plusieurs images
             if(FilesView.Items[0].Tag != null)
             {
