@@ -27,10 +27,11 @@ namespace metaeditor
             String displayText = "";
             foreach (int i in image.PropertyIdList)
             {
-                if (displayedIds.Contains(i))
+                if (displayedIds.Contains(i) && i != 0)
                 {
                     displayText += "-" + _metaeditor.propertyIds[i] + ": ";
                     displayText += MetaEditor.DecodeProperty(image.GetPropertyItem(i));
+                    displayText += "\n";
                 }
             }
             TextDataDiaplay.Text = displayText;

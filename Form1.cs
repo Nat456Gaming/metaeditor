@@ -52,288 +52,122 @@ namespace metaeditor
         }
 
         //Types de métadonnées (soustraire 1)
-        public String[] propertyTypes = ["Bytes", "ASCII", "UInt16", "UInt32", "UInt32 Fraction", "Any", "Int32", "", "", "Int32 Fraction"];
+        public String[] propertyTypes = ["Bytes", "ASCII", "UInt16 (Short)", "UInt32 (Long)", "UInt32 Fraction (Rational)", "Any", "Int32 (SLong)", "", "", "Int32 Fraction (SRational)"];
 
         //ID métadonnées
         public readonly Dictionary<Int32, String> propertyIds = new()
         {
-            { 0x0000, "GpsVer" },
-            { 0x0001, "GpsLatitudeRef" },
-            { 0x0002, "GpsLatitude" },          //
-            { 0x0003, "GpsLongitudeRef" },
-            { 0x0004, "GpsLongitude" },         //
-            { 0x0005, "GpsAltitudeRef" },
-            { 0x0006, "GpsAltitude" },          //
-            { 0x0007, "GpsGpsTime" },
-            { 0x0008, "GpsGpsSatellites" },
-            { 0x0009, "GpsGpsStatus" },
-            { 0x000A, "GpsGpsMeasureMode" },
-            { 0x000B, "GpsGpsDop" },
-            { 0x000C, "GpsSpeedRef" },
-            { 0x000D, "GpsSpeed" },
-            { 0x000E, "GpsTrackRef" },
-            { 0x000F, "GpsTrack" },
-            { 0x0010, "GpsImgDirRef" },
-            { 0x0011, "GpsImgDir" },
-            { 0x0012, "GpsMapDatum" },
-            { 0x0013, "GpsDestLatRef" },
-            { 0x0014, "GpsDestLat" },
-            { 0x0015, "GpsDestLongRef" },
-            { 0x0016, "GpsDestLong" },
-            { 0x0017, "GpsDestBearRef" },
-            { 0x0018, "GpsDestBear" },
-            { 0x0019, "GpsDestDistRef" },
-            { 0x001A, "GpsDestDist" },
+            { 0x0002, "GpsLatitude" },
+            { 0x0004, "GpsLongitude" },
+            { 0x0006, "GpsAltitude" },
 
-            { 0x001D, "29" },
+            { 0x010D, "DocumentName" },
+            { 0x010E, "ImageDescription" },
+            { 0x010F, "EquipMake" },
+            { 0x0110, "EquipModel" },
 
-            { 0x00FE, "NewSubfileType" },
-            { 0x00FF, "SubfileType" },
-            { 0x0100, "ImageWidth" },
-            { 0x0101, "ImageHeight" },
-            { 0x0102, "BitsPerSample" },
-            { 0x0103, "TagCompression" },
+            { 0x0131, "SoftwareUsed" },
+            { 0x0132, "DateTime" },
 
-            { 0x0106, "PhotometricInterp" },
-            { 0x0107, "ThreshHolding" },
-            { 0x0108, "CellWidth" },
-            { 0x0109, "CellHeight" },
-            { 0x010A, "FillOrder" },
+            { 0x013B, "Artist" },
+            { 0x013C, "HostComputer" },
 
-            { 0x010D, "DocumentName" },         //
-            { 0x010E, "ImageDescription" },     //
-            { 0x010F, "EquipMade" },            //
-            { 0x0110, "EquipModel" },           //
-            { 0x0111, "StripOffsets" },
-            { 0x0112, "Orientation" },
+            { 0x0320, "ImageTitle" },
 
-            { 0x0115, "SamplesPerPixel" },
-            { 0x0116, "RowsPerStrip" },
-            { 0x0117, "StripBytesCount" },
-            { 0x0118, "MinSampleValue" },
-            { 0x0119, "MaxSampleValue" },
-            { 0x011A, "XResolution" },
-            { 0x011B, "YResolution" },
-            { 0x011C, "PlanarConfig" },
-            { 0x011D, "PageName" },
-            { 0x011E, "XPosition" },
-            { 0x011F, "YPosition" },
-            { 0x0120, "FreeOffset" },
-            { 0x0121, "FreeByteCounts" },
-            { 0x0122, "GrayResponseUnit" },
-            { 0x0123, "GrayResponseCurve" },
-            { 0x0124, "T4Option" },
-            { 0x0125, "T6Option" },
-
-            { 0x0128, "ResolutionUnit" },
-            { 0x0129, "PageNumber" },
-
-            { 0x012D, "TranferFunction" },
-
-            { 0x0131, "SoftwareUsed" },         //
-            { 0x0132, "DateTime" },             //
-
-            { 0x013B, "Artist" },               //
-            { 0x013C, "HostComputer" },         //
-            { 0x013D, "Predictor" },
-            { 0x013E, "WhitePoint" },
-            { 0x013F, "PrimaryChromaticies" },
-            { 0x0140, "ColorMap" },
-            { 0x0141, "HalftoneHints" },
-            { 0x0142, "TileWidth" },
-            { 0x0143, "TileLenght" },
-            { 0x0144, "TileOffset" },
-            { 0x0145, "TileByteCounts" },
-
-            { 0x014C, "InkSet" },
-            { 0x014D, "InkNames" },
-            { 0x014E, "NumberOfInks" },
-
-            { 0x0150, "DotRange" },
-            { 0x0151, "TargetPrinter" },
-            { 0x0152, "ExtraSamples" },
-            { 0x0153, "SampleFormat" },
-            { 0x0154, "SMinSampleValue" },
-            { 0x0155, "SMaxSampleValue" },
-            { 0x0156, "TranferRange" },
-
-            { 0x0200, "JPEGProc" },
-            { 0x0201, "JPEGInterFormat" },
-            { 0x0202, "JPEGInterLenght" },
-            { 0x0203, "JPEGRestartInterval" },
-
-            { 0x0205, "JPEGLosslessPredictors" },
-            { 0x0206, "JPEGPointTransforms" },
-            { 0x0207, "JPEGQTables" },
-            { 0x0208, "JPEGDCTables" },
-            { 0x0209, "JPEGACTables" },
-
-            { 0x0211, "YCbCrCoefficients" },
-            { 0x0212, "YCbCrSubsampling" },
-            { 0x0213, "YCbCrPositionning" },
-            { 0x0214, "REFBlackWhite" },
-
-            { 0x0301, "TagGamma" },
-            { 0x0302, "ICCProfileDescriptor" },
-            { 0x0303, "SRGBRenderingIntent" },
-
-            { 0x0320, "ImageTitle" },               //
-
-            { 0x5001, "ResolutionXUnit" },
-            { 0x5002, "ResolutionYUnit" },
-            { 0x5003, "ResolutionXLenghtUnit" },
-            { 0x5004, "ResolutionYLenghtUnit" },
-            { 0x5005, "PrintFlags" },
-            { 0x5006, "PrintFlagsVersion" },
-            { 0x5007, "PrintFlagsCrop" },
-            { 0x5008, "PrintFlagsBleedWith" },
-            { 0x5009, "PrintFlagsBleedWidthScale" },
-            { 0x500A, "HalftoneLPI" },
-            { 0x500B, "HalftoneLPIUnit" },
-            { 0x500C, "HalftoneDegree" },
-            { 0x500D, "HalftoneShape" },
-            { 0x500E, "HaltoneMisc" },
-            { 0x500F, "HalftoneScreen" },
-            { 0x5010, "JPEGQuality" },
-            { 0x5011, "GridSize" },
-            { 0x5012, "ThumbnailFormat" },
-            { 0x5013, "ThumbnailWidth" },
-            { 0x5014, "ThumbnailHeight" },
-            { 0x5015, "ThumbnailColorDepth" },
-            { 0x5016, "ThumbnailPlanes" },
-            { 0x5017, "ThumbnailRawBytes" },
-            { 0x5018, "ThumbnailSize" },
-            { 0x5019, "ThumbnailCompressedSize" },
-            { 0x501A, "ColorTransferFunction" },
-            { 0x501B, "ThumbnailData" },
-
-            { 0x5020, "ThumbnailImageWidth" },
-            { 0x5021, "ThumbnailImageHeight" },
-            { 0x5022, "ThumbnailBitsPerSample" },
-            { 0x5023, "ThumbnailCompression" },
-            { 0x5024, "ThumbnailPhotometricInterp" },
             { 0x5025, "ThumbnailImageDescription" },
-            { 0x5026, "ThumbnailEquipMake" },               //
-            { 0x5027, "ThumbnailEquipModel" },              //
-            { 0x5028, "ThumbnailStripOffsets" },
-            { 0x5029, "ThumbnailOrientation" },
-            { 0x502A, "ThumbnailSamplesPerPixel" },
-            { 0x502B, "ThumbnailRowsPerStrip" },
-            { 0x502C, "ThumbnailStripBytesCount" },
-            { 0x502D, "ThumbnailResolutionX" },
-            { 0x502E, "ThumbnailResolutionY" },
-            { 0x502F, "ThumbnailPlanarConfig" },
-            { 0x5030, "ThumbnailResolutionUnit" },
-            { 0x5031, "ThumbnailTransferFunction" },
+            { 0x5026, "ThumbnailEquipMake" },
+            { 0x5027, "ThumbnailEquipModel" },
             { 0x5032, "ThumbnailSoftwareUsed" },
-            { 0x5033, "ThumbnailDateTime" },                //
-            { 0x5034, "ThumbnailArtist" },                  //
-            { 0x5035, "ThumbnailWhitePoint" },
-            { 0x5036, "ThumbnailPrimaryChromaticies" },
-            { 0x5037, "ThumbnailYCbCrCoefficients" },
-            { 0x5038, "ThumbnailYCbCrSubsampling" },
-            { 0x5039, "ThumbnailYCbCrPositioning" },
-            { 0x503A, "ThumbnailRefBlackWhite" },
-            { 0x503B, "ThumbnailCopyRight" },               //
+            { 0x5033, "ThumbnailDateTime" },
+            { 0x5034, "ThumbnailArtist" },
+            { 0x503B, "ThumbnailCopyRight" },
 
-            { 0x5041, "20545" },
-            { 0x5042, "20546" },
-
-            { 0x5090, "LuminanceTable" },
-            { 0x5091, "ChrominanceTable" },
-
-            { 0x5100, "FrameDelay" },
-            { 0x5101, "LoopCount" },
-            { 0x5102, "GlobalPalette" },
-            { 0x5103, "IndexBackground" },
-            { 0x5104, "IndexTransparent" },
-
-            { 0x5110, "PixelUnit" },
-            { 0x5111, "PixelPerUnitX" },
-            { 0x5112, "PixelPerUnitY" },
-            { 0x5113, "PaletteHistogram" },
-
-            { 0x8298, "Copyright" },                        //
+            { 0x8298, "Copyright" },
 
             { 0x829A, "ExifExposureTime" },
 
-            { 0x829D, "ExifFNumber" },
-
-            { 0x8769, "ExifIFD" },
-
-            { 0x8773, "ICCProfile" },
-
             { 0x8822, "ExifExposureProg" },
 
-            { 0x8824, "ExifSpectralSense" },
-            { 0x8825, "GpsIFD" },
+            { 0x8827, "ExifISOSpeed" },
 
-            { 0x8827, "ExifISOSpeed" },                     //
-            { 0x8828, "ExifOECF" },
+            { 0x9201, "ExifShutterSpeed" },
+            { 0x9202, "ExifAperture" },
+            { 0x9203, "ExifBrightness" },
+            { 0x9204, "ExifExposureBias" },
+            { 0x9205, "ExifMaxAperture" },
+            { 0x9206, "ExifSubjectDist" },
+            { 0x9207, "ExifMeteringMode" },
+            { 0x9208, "ExifLightSource" },
+            { 0x9209, "ExifFlash" },
+            { 0x920A, "ExifFocalLenght" },
 
-            { 0x8830, "34864" },
+            { 0x927C, "ExifMakerNote" },
 
-            { 0x9000, "ExifVer" },
+            { 0x9286, "ExifUserComment" }
+        };
 
-            { 0x9003, "ExifDTOrig" },
-            { 0x9004, "ExifDTDigitized" },
+        public struct MetadataProperties
+        {
+            public short type;
+            public int l_min;
+            public int l_max;
+            public MetadataProperties(short i_type, int i_l_min, int i_l_max)
+            {
+                type = i_type;
+                l_min = i_l_min;
+                l_max = i_l_max;
+            }
+        }
 
-            { 0x9101, "ExifCompConfig" },
-            { 0x9102, "ExifCompBPP" },
+        public readonly Dictionary<Int32, MetadataProperties> propertyIdTypes = new()
+        {
+            { 0x0002, new MetadataProperties(5,3,3) },
+            { 0x0004, new MetadataProperties(5,3,3) },
+            { 0x0006, new MetadataProperties(5,3,3) },
 
-            { 0x9201, "ExifShutterSpeed" },                 //
-            { 0x9202, "ExifAperture" },                     //
-            { 0x9203, "ExifBrightness" },                   //
-            { 0x9204, "ExifExposureBias" },                 //
-            { 0x9205, "ExifMaxAperture" },                  //
-            { 0x9206, "ExifSubjectDist" },                  //
-            { 0x9207, "ExifMeteringMode" },                 //
-            { 0x9208, "ExifLightSource" },                  //
-            { 0x9209, "ExifFlash" },                        //
-            { 0x920A, "ExifFocalLenght" },                  //
+            { 0x010D, new MetadataProperties(2,-1,-1) },
+            { 0x010E, new MetadataProperties(2,-1,-1) },
+            { 0x010F, new MetadataProperties(2,-1,-1) },
+            { 0x0110, new MetadataProperties(2,-1,-1) },
 
-            { 0x927C, "ExifMakerMode" },
+            { 0x0131, new MetadataProperties(2,-1,-1) },
+            { 0x0132, new MetadataProperties(2,20,20) },
 
-            { 0x9286, "ExifUserComment" },                  //
-            { 0x9290, "ExifDTSubsec" },
-            { 0x9291, "ExifDTOrigSS" },
-            { 0x9292, "ExifDTDigSS" },
+            { 0x013B, new MetadataProperties(2,-1,-1) },
+            { 0x013C, new MetadataProperties(2,-1,-1) },
 
-            { 0xA000, "ExifFPXVer" },
-            { 0xA001, "ExifColorSpace" },
-            { 0xA002, "ExifPixXDim" },
-            { 0xA003, "ExifPixYDim" },
-            { 0xA004, "ExifRelatedWav" },
-            { 0xA005, "ExifInterop" },
+            { 0x0320, new MetadataProperties(2,-1,-1) },
 
-            { 0xA20B, "ExifFlashEnergy" },
-            { 0xA20C, "ExifSpacialFR" },
+            { 0x5025, new MetadataProperties(2,-1,-1) },
+            { 0x5026, new MetadataProperties(2,-1,-1) },
+            { 0x5027, new MetadataProperties(2,-1,-1) },
+            { 0x5032, new MetadataProperties(2,-1,-1) },
+            { 0x5033, new MetadataProperties(2,20,20) },
+            { 0x5034, new MetadataProperties(2,-1,-1) },
+            { 0x503B, new MetadataProperties(2,-1,-1) },
 
-            { 0xA20E, "ExifFocalXRes" },
-            { 0xA20F, "ExifFocalYRes" },
-            { 0xA210, "ExifFocalResUnit" },
+            { 0x8298, new MetadataProperties(2,-1,-1) },
 
-            { 0xA214, "ExifSubjectLoc" },
-            { 0xA215, "ExifExposureIndex" },
+            { 0x829A, new MetadataProperties(5,1,1) },
 
-            { 0xA217, "ExifSensingMethod" },
+            { 0x8822, new MetadataProperties(3,1,1) },
 
-            { 0xA300, "ExifFileSource" },
-            { 0xA301, "ExifSceneType" },
-            { 0xA302, "ExifCfaPattern" },
+            { 0x8827, new MetadataProperties(3,0,-1) },
 
-            { 0xA401, "41985" },
-            { 0xA402, "41986" },
-            { 0xA403, "41987" },
-            { 0xA404, "41988" },
-            { 0xA405, "41989" },
-            { 0xA406, "41990" },
-            { 0xA407, "41991" },
-            { 0xA408, "41992" },
-            { 0xA409, "41993" },
-            { 0xA40A, "41994" },
-            { 0xA40B, "41995" },
-            { 0xA40C, "41996" }
+            { 0x9201, new MetadataProperties(10,1,1) },
+            { 0x9202, new MetadataProperties(5,1,1) },
+            { 0x9203, new MetadataProperties(10,1,1) },
+            { 0x9204, new MetadataProperties(10,1,1) },
+            { 0x9205, new MetadataProperties(5,1,1) },
+            { 0x9206, new MetadataProperties(5,1,1) },
+            { 0x9207, new MetadataProperties(3,1,1) },
+            { 0x9208, new MetadataProperties(3,1,1) },
+            { 0x9209, new MetadataProperties(3,1,1) },
+            { 0x920A, new MetadataProperties(5,1,1) },
+
+            { 0x927C, new MetadataProperties(6,-1,-1) },
+
+            { 0x9286, new MetadataProperties(6,-1,-1) }
         };
 
         public static String DecodeProperty(System.Drawing.Imaging.PropertyItem? property)
@@ -343,7 +177,7 @@ namespace metaeditor
                 switch (property.Type)
                 {
                     case 2:
-                        return System.Text.Encoding.UTF8.GetString(property.Value, 0, property.Len - 1) + "\n";
+                        return System.Text.Encoding.UTF8.GetString(property.Value, 0, property.Len - 1);
 
                     case 3:
                         UInt16[] val_uint16 = new UInt16[property.Len / 2];
@@ -352,37 +186,218 @@ namespace metaeditor
                             byte[] val = { property.Value[2 * j], property.Value[2 * j + 1] };
                             val_uint16[j] = BitConverter.ToUInt16(val);
                         }
-                        return String.Join("-", val_uint16) + "\n";
+                        return String.Join("-", val_uint16);
 
                     case 4:
-                        UInt32[] val_uint32 = new UInt32[property.Len / 2];
+                        UInt32[] val_uint32 = new UInt32[property.Len / 4];
                         for (int j = 0; j < property.Len / 4; j++)
                         {
                             byte[] val = { property.Value[4 * j], property.Value[4 * j + 1], property.Value[4 * j + 2], property.Value[4 * j + 3] };
                             val_uint32[j] = BitConverter.ToUInt32(val);
                         }
-                        return String.Join("-", val_uint32) + "\n";
+                        return String.Join("-", val_uint32);
+
+                    case 5:
+                        UInt32[,] frac_uint32 = new UInt32[property.Len / 8, 2];
+                        for (int j = 0; j < property.Len / 8; j ++)
+                        {
+                            byte[] val1 = { property.Value[8 * j], property.Value[8 * j + 1], property.Value[8 * j + 2], property.Value[8 * j + 3] };
+                            frac_uint32[j,0] = BitConverter.ToUInt32(val1);
+                            byte[] val2 = { property.Value[8 * j + 4], property.Value[8 * j + 5], property.Value[8 * j + 6], property.Value[8 * j + 7] };
+                            frac_uint32[j,1] = BitConverter.ToUInt32(val2);
+                        }
+                        string[] joinustr = new string[property.Len / 8];
+                        for (int j = 0;j < property.Len / 8; j++)
+                        {
+                            joinustr[j] = frac_uint32[j, 0] + "/" + frac_uint32[j, 1];
+                        }
+
+                        return String.Join("-", joinustr);
 
                     case 7:
-                        Int32[] val_int32 = new Int32[property.Len / 2];
+                        Int32[] val_int32 = new Int32[property.Len / 4];
                         for (int j = 0; j < property.Len / 4; j++)
                         {
                             byte[] val = { property.Value[4 * j], property.Value[4 * j + 1], property.Value[4 * j + 2], property.Value[4 * j + 3] };
                             val_int32[j] = BitConverter.ToInt32(val);
                         }
-                        return String.Join("-", val_int32) + "\n";
+                        return String.Join("-", val_int32);
+
+                    case 10:
+                        Int32[,] frac_int32 = new Int32[property.Len / 8, 2];
+                        for (int j = 0; j < property.Len / 8; j++)
+                        {
+                            byte[] val1 = { property.Value[8 * j], property.Value[8 * j + 1], property.Value[8 * j + 2], property.Value[8 * j + 3] };
+                            frac_int32[j, 0] = BitConverter.ToInt32(val1);
+                            byte[] val2 = { property.Value[8 * j + 4], property.Value[8 * j + 5], property.Value[8 * j + 6], property.Value[8 * j + 7] };
+                            frac_int32[j, 1] = BitConverter.ToInt32(val2);
+                        }
+                        string[] joinstr = new string[property.Len / 8];
+                        for (int j = 0; j < property.Len / 8; j++)
+                        {
+                            joinstr[j] = frac_int32[j, 0] + "/" + frac_int32[j, 1];
+                        }
+
+                        return String.Join("-", joinstr);
 
                     default:
-                        return " \n";
+                        return "";
                 }
             }
             return "";
         }
 
-        //Fonction qui permet d'avoir le nom du dossier en fonction du niveau de la variable $FOLDER
-        private string GetFolderName(string path, int level)
+        public bool EncodeProperty(String input, Int32 propertyId, Image image)
         {
-            DirectoryInfo dir = new DirectoryInfo(path);
+            //PropertyItem does not have a constructor so we take one from the image
+            System.Drawing.Imaging.PropertyItem property = image.PropertyItems[0];
+            //we put the new type
+            property.Type = this.propertyIdTypes[propertyId].type;
+            property.Id = propertyId;
+            switch (property.Type)
+            {
+                case 2:
+                    if ((input.Length + 1 >= this.propertyIdTypes[propertyId].l_min || this.propertyIdTypes[propertyId].l_min < 0) && (input.Length + 1 <= this.propertyIdTypes[propertyId].l_min || this.propertyIdTypes[propertyId].l_max < 0))
+                    {
+                        property.Value = System.Text.Encoding.UTF8.GetBytes(input + '\0');
+                        property.Len = input.Length + 1;
+                        image.SetPropertyItem(property);
+                        return true;
+                    }
+                    return false;
+                case 3:
+                    string[] values_uint16 = input.Split('-');
+                    if ((values_uint16.Length >= this.propertyIdTypes[propertyId].l_min || this.propertyIdTypes[propertyId].l_min < 0) && (values_uint16.Length <= this.propertyIdTypes[propertyId].l_min || this.propertyIdTypes[propertyId].l_max < 0))
+                    {
+                        UInt16[] val_uint16 = new UInt16[values_uint16.Length];
+                        for (int i = 0; i < values_uint16.Length; i++)
+                        {
+                            val_uint16[i] = UInt16.Parse(values_uint16[i].Trim(' '));
+                        }
+                        byte[] out_uint16 = new byte[2 * val_uint16.Length];
+                        for (int i = 0; i < values_uint16.Length; i++)
+                        {
+                            byte[] val = BitConverter.GetBytes(val_uint16[i]);
+                            out_uint16[2 * i] = val[0];
+                            out_uint16[2 * i + 1] = val[1];
+                        }
+                        property.Value = out_uint16;
+                        property.Len = out_uint16.Length;
+                        image.SetPropertyItem(property);
+                        return true;
+                    }
+                    return false;
+                case 4:
+                    string[] values_uint32 = input.Split('-');
+                    if ((values_uint32.Length >= this.propertyIdTypes[propertyId].l_min || this.propertyIdTypes[propertyId].l_min < 0) && (values_uint32.Length <= this.propertyIdTypes[propertyId].l_min || this.propertyIdTypes[propertyId].l_max < 0))
+                    {
+                        UInt32[] val_uint32 = new UInt32[values_uint32.Length];
+                        for (int i = 0; i < values_uint32.Length; i++)
+                        {
+                            val_uint32[i] = UInt32.Parse(values_uint32[i].Trim(' '));
+                        }
+                        byte[] out_uint32 = new byte[4 * val_uint32.Length];
+                        for (int i = 0; i < values_uint32.Length; i++)
+                        {
+                            byte[] val = BitConverter.GetBytes(val_uint32[i]);
+                            out_uint32[4 * i] = val[0];
+                            out_uint32[4 * i + 1] = val[1];
+                            out_uint32[4 * i + 2] = val[2];
+                            out_uint32[4 * i + 3] = val[3];
+                        }
+                        property.Value = out_uint32;
+                        property.Len = out_uint32.Length;
+                        image.SetPropertyItem(property);
+                        return true;
+                    }
+                    return false;
+                case 5:
+                    string[] values_uint32_f = input.Split('-');
+                    if ((values_uint32_f.Length >= this.propertyIdTypes[propertyId].l_min || this.propertyIdTypes[propertyId].l_min == -1) && (values_uint32_f.Length <= this.propertyIdTypes[propertyId].l_min || this.propertyIdTypes[propertyId].l_max == -1))
+                    {
+                        UInt32[] frac_uint32 = new UInt32[values_uint32_f.Length * 2];
+                        for (int i = 0; i < values_uint32_f.Length; i++)
+                        {
+                            string[] temp = values_uint32_f[i].Split("/");
+                            if (temp.Length != 2) return false;
+                            frac_uint32[2 * i] = UInt32.Parse(temp[0].Trim(' '));
+                            frac_uint32[2 * i + 1] = UInt32.Parse(temp[1].Trim(' '));
+                        }
+                        byte[] out_uint32_f = new byte[4 * frac_uint32.Length];
+                        for (int i = 0; i < frac_uint32.Length; i++)
+                        {
+                            byte[] val = BitConverter.GetBytes(frac_uint32[i]);
+                            out_uint32_f[4 * i] = val[0];
+                            out_uint32_f[4 * i + 1] = val[1];
+                            out_uint32_f[4 * i + 2] = val[2];
+                            out_uint32_f[4 * i + 3] = val[3];
+                        }
+                        property.Value = out_uint32_f;
+                        property.Len = out_uint32_f.Length;
+                        image.SetPropertyItem(property);
+                        return true;
+                    }
+                    return false;
+                case 7:
+                    string[] values_int32 = input.Split('-');
+                    if ((values_int32.Length >= this.propertyIdTypes[propertyId].l_min || this.propertyIdTypes[propertyId].l_min == -1) && (values_int32.Length <= this.propertyIdTypes[propertyId].l_min || this.propertyIdTypes[propertyId].l_max == -1))
+                    {
+                        Int32[] val_int32 = new Int32[values_int32.Length];
+                        for (int i = 0; i < values_int32.Length; i++)
+                        {
+                            val_int32[i] = Int32.Parse(values_int32[i].Trim(' '));
+                        }
+                        byte[] out_int32 = new byte[4 * val_int32.Length];
+                        for (int i = 0; i < values_int32.Length; i++)
+                        {
+                            byte[] val = BitConverter.GetBytes(val_int32[i]);
+                            out_int32[4 * i] = val[0];
+                            out_int32[4 * i + 1] = val[1];
+                            out_int32[4 * i + 2] = val[2];
+                            out_int32[4 * i + 3] = val[3];
+                        }
+                        property.Value = out_int32;
+                        property.Len = out_int32.Length;
+                        image.SetPropertyItem(property);
+                        return true;
+                    }
+                    return false;
+                case 10:
+                    string[] values_int32_f = input.Split('-');
+                    if ((values_int32_f.Length >= this.propertyIdTypes[propertyId].l_min || this.propertyIdTypes[propertyId].l_min == -1) && (values_int32_f.Length <= this.propertyIdTypes[propertyId].l_min || this.propertyIdTypes[propertyId].l_max == -1))
+                    {
+                        Int32[] frac_int32 = new Int32[values_int32_f.Length * 2];
+                        for (int i = 0; i < values_int32_f.Length; i++)
+                        {
+                            string[] temp = values_int32_f[i].Split("/");
+                            if (temp.Length != 2) return false;
+                            frac_int32[2 * i] = Int32.Parse(temp[0].Trim(' '));
+                            frac_int32[2 * i + 1] = Int32.Parse(temp[1].Trim(' '));
+                        }
+                        byte[] out_int32_f = new byte[4 * frac_int32.Length];
+                        for (int i = 0; i < frac_int32.Length; i++)
+                        {
+                            byte[] val = BitConverter.GetBytes(frac_int32[i]);
+                            out_int32_f[4 * i] = val[0];
+                            out_int32_f[4 * i + 1] = val[1];
+                            out_int32_f[4 * i + 2] = val[2];
+                            out_int32_f[4 * i + 3] = val[3];
+                        }
+                        property.Value = out_int32_f;
+                        property.Len = out_int32_f.Length;
+                        image.SetPropertyItem(property);
+                        return true;
+                    }
+                    return false;
+                default:
+                    return false;
+            }
+        }
+
+        //Fonction qui permet d'avoir le nom du dossier en fonction du niveau de la variable $FOLDER
+        private static string GetFolderName(string path, int level)
+        {
+            DirectoryInfo dir = new(path);
 
             for (int i = 0; i < level; i++)
             {
@@ -398,12 +413,12 @@ namespace metaeditor
         private string ResolveValue(string input, string imgpath)
         {
             //Test si c'est juste du texte sans "$"
-            if (!input.StartsWith("$"))
+            if (!input.StartsWith('$'))
             {
                 return input;
             }
             //Ici, il y'a "$", d'abord il faut extraire le nom du token (ex: FOLDER, DATE...)
-            string token = new string(input.Skip(1).TakeWhile(char.IsLetter).ToArray()); //Le skip ne prend pas le premier caractère qui est "$", ensuite il prend les caractères qui sont des lettres et enfin il le transforme en tableau donc en un string
+            string token = new(input.Skip(1).TakeWhile(char.IsLetter).ToArray()); //Le skip ne prend pas le premier caractère qui est "$", ensuite il prend les caractères qui sont des lettres et enfin il le transforme en tableau donc en un string
             //Correspondance avec le dictionnaire
             if (handlers.TryGetValue(token, out var handler))
             {
@@ -465,22 +480,29 @@ namespace metaeditor
                 //Test pour vérifier s'ils sont verts (c'est seulement les verts qui faut changer)
                 if(item.ForeColor == Color.Green)
                 {
-                    //Parcours de displayedID et NewValue pour pouvoir les appliqués
+                    //Parcours de displayedID et NewValue pour pouvoir tous les appliquer a chaque image
                     for(int i = 0; i < _PropertyEditorNb; i++)
                     {
-                        //Test pour vérifier qu'il est bien présent dans le dictonnaire
-                        if (propertyIds.TryGetValue(_displayedIds[i], out string a))
+                        //Test pour vérifier que l'Id de propriété est bien présent dans le dictonnaire
+                        if (propertyIds.TryGetValue(_displayedIds[i], out string? a))
                         {
-                            //Appel du fonction EncodeProperty
+                            if (item.Tag != null)
+                            {
+                                //Appel du fonction EncodeProperty
+                                string value = ResolveValue(_NewValue[i], item.Tag.ToString());
+                                if(! EncodeProperty(value, _displayedIds[i], Image.FromFile(item.Tag.ToString())))
+                                {
+                                    item.ForeColor = Color.Orange;
+                                    throw new Exception("Error writing the property:" + _displayedIds[i] + " Value:" + value + " to image: " + item.Tag.ToString());
+                                }
+                                else
+                                {
+                                    item.ForeColor = Color.Blue;
+                                }
+                            }
                         }
                     }
                 }
-            }
-            /// Méthode pour appliquer les changements des propreiétés d'une ou plusieurs images
-            if(FilesView.Items[0].Tag != null)
-            {
-                string value = _NewValue[0]; //Récuper la valeur à changer (pour l'instant le premier)
-                Test_affiche.Text = ResolveValue(value, FilesView.Items[0].Tag.ToString());
             }
         }
 
