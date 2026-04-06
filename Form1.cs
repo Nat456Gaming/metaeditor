@@ -19,17 +19,20 @@ namespace metaeditor
     }
     public partial class MetaEditor : Form
     {
-        //Déclaration du dictionnaire de variable à "$"
-        private readonly Dictionary<string, Func<string, string, string>> handlers;
+        //Déclaration du dictionnaire des handlers à "$"
+        private readonly Dictionary<string, Func<string, string, string?>> handlers;
 
         //Creation de la fenetre pour affichage MouseMove
         private readonly OverlayImage _previewForm;
         //Mise en place d'une sécurité pour éviter d'afficher en continu pour MouseMove
         private ListViewItem? _lastItem;
 
+        //Nombre d'objets PropertyEditor créés
         private int _PropertyEditorNb;
-        private List<int> _displayedIds;
-        private List<string> _NewValue;
+        //ID séectionnés dans les ComboBox
+        private readonly List<int> _displayedIds;
+        //Valeurs insérées dans les TextInput
+        private readonly List<string> _NewValue;
 
         public MetaEditor()
         {
@@ -41,8 +44,8 @@ namespace metaeditor
             _displayedIds = [];
             _NewValue = [];
 
-            //Définition du dictionnaire de variable à "$"
-            handlers = new Dictionary<string, Func<string, string, string>>
+            //Définition du dictionnaire des endlers à "$"
+            handlers = new Dictionary<string, Func<string, string, string?>>
             {
                 { "FOLDER", HandleFolder },
                 { "DATE", HandleDate },
@@ -106,17 +109,11 @@ namespace metaeditor
             { 0x9286, "ExifUserComment" }
         };
 
-        public struct MetadataProperties
+        public struct MetadataProperties(short i_type, int i_l_min, int i_l_max)
         {
-            public short type;
-            public int l_min;
-            public int l_max;
-            public MetadataProperties(short i_type, int i_l_min, int i_l_max)
-            {
-                type = i_type;
-                l_min = i_l_min;
-                l_max = i_l_max;
-            }
+            public short type = i_type;
+            public int l_min = i_l_min;
+            public int l_max = i_l_max;
         }
 
         public readonly Dictionary<Int32, MetadataProperties> propertyIdTypes = new()
@@ -176,10 +173,13 @@ namespace metaeditor
             {
                 switch (property.Type)
                 {
-                    case 2:
+                    case 1: //Bytes
+                        return BitConverter.ToString(property.Value);
+
+                    case 2: // ASCII
                         return System.Text.Encoding.UTF8.GetString(property.Value, 0, property.Len - 1);
 
-                    case 3:
+                    case 3: // UInt16 (Short)
                         UInt16[] val_uint16 = new UInt16[property.Len / 2];
                         for (int j = 0; j < property.Len / 2; j++)
                         {
@@ -188,7 +188,7 @@ namespace metaeditor
                         }
                         return String.Join("-", val_uint16);
 
-                    case 4:
+                    case 4: // UInt32 (Long)
                         UInt32[] val_uint32 = new UInt32[property.Len / 4];
                         for (int j = 0; j < property.Len / 4; j++)
                         {
@@ -197,7 +197,7 @@ namespace metaeditor
                         }
                         return String.Join("-", val_uint32);
 
-                    case 5:
+                    case 5: // UInt32 Fraction (Rational)
                         UInt32[,] frac_uint32 = new UInt32[property.Len / 8, 2];
                         for (int j = 0; j < property.Len / 8; j ++)
                         {
@@ -214,7 +214,10 @@ namespace metaeditor
 
                         return String.Join("-", joinustr);
 
-                    case 7:
+                    case 6: // Any
+                        return BitConverter.ToString(property.Value);
+
+                    case 7: // Int32 (SLong)
                         Int32[] val_int32 = new Int32[property.Len / 4];
                         for (int j = 0; j < property.Len / 4; j++)
                         {
@@ -223,7 +226,7 @@ namespace metaeditor
                         }
                         return String.Join("-", val_int32);
 
-                    case 10:
+                    case 10: // Int32 Fraction (SRational)
                         Int32[,] frac_int32 = new Int32[property.Len / 8, 2];
                         for (int j = 0; j < property.Len / 8; j++)
                         {
@@ -251,12 +254,14 @@ namespace metaeditor
         {
             //PropertyItem does not have a constructor so we take one from the image
             System.Drawing.Imaging.PropertyItem property = image.PropertyItems[0];
-            //we put the new type
+            //we put the new type and new Id
             property.Type = this.propertyIdTypes[propertyId].type;
             property.Id = propertyId;
+
+            //we encode the value depending on the type
             switch (property.Type)
             {
-                case 2:
+                case 2: // ASCII
                     if ((input.Length + 1 >= this.propertyIdTypes[propertyId].l_min || this.propertyIdTypes[propertyId].l_min < 0) && (input.Length + 1 <= this.propertyIdTypes[propertyId].l_min || this.propertyIdTypes[propertyId].l_max < 0))
                     {
                         property.Value = System.Text.Encoding.UTF8.GetBytes(input + '\0');
@@ -265,7 +270,8 @@ namespace metaeditor
                         return true;
                     }
                     return false;
-                case 3:
+
+                case 3: // UInt16 (Short)
                     string[] values_uint16 = input.Split('-');
                     if ((values_uint16.Length >= this.propertyIdTypes[propertyId].l_min || this.propertyIdTypes[propertyId].l_min < 0) && (values_uint16.Length <= this.propertyIdTypes[propertyId].l_min || this.propertyIdTypes[propertyId].l_max < 0))
                     {
@@ -287,7 +293,8 @@ namespace metaeditor
                         return true;
                     }
                     return false;
-                case 4:
+
+                case 4: // UInt32 (Long)
                     string[] values_uint32 = input.Split('-');
                     if ((values_uint32.Length >= this.propertyIdTypes[propertyId].l_min || this.propertyIdTypes[propertyId].l_min < 0) && (values_uint32.Length <= this.propertyIdTypes[propertyId].l_min || this.propertyIdTypes[propertyId].l_max < 0))
                     {
@@ -311,7 +318,8 @@ namespace metaeditor
                         return true;
                     }
                     return false;
-                case 5:
+
+                case 5: // UInt32 Fraction (Rational)
                     string[] values_uint32_f = input.Split('-');
                     if ((values_uint32_f.Length >= this.propertyIdTypes[propertyId].l_min || this.propertyIdTypes[propertyId].l_min == -1) && (values_uint32_f.Length <= this.propertyIdTypes[propertyId].l_min || this.propertyIdTypes[propertyId].l_max == -1))
                     {
@@ -338,7 +346,8 @@ namespace metaeditor
                         return true;
                     }
                     return false;
-                case 7:
+
+                case 7: // Int32 (SLong)
                     string[] values_int32 = input.Split('-');
                     if ((values_int32.Length >= this.propertyIdTypes[propertyId].l_min || this.propertyIdTypes[propertyId].l_min == -1) && (values_int32.Length <= this.propertyIdTypes[propertyId].l_min || this.propertyIdTypes[propertyId].l_max == -1))
                     {
@@ -362,7 +371,8 @@ namespace metaeditor
                         return true;
                     }
                     return false;
-                case 10:
+
+                case 10: // Int32 Fraction (SRational)
                     string[] values_int32_f = input.Split('-');
                     if ((values_int32_f.Length >= this.propertyIdTypes[propertyId].l_min || this.propertyIdTypes[propertyId].l_min == -1) && (values_int32_f.Length <= this.propertyIdTypes[propertyId].l_min || this.propertyIdTypes[propertyId].l_max == -1))
                     {
@@ -410,14 +420,14 @@ namespace metaeditor
         }
 
         //Cette fonction permet d'englober les noms et les variables spéciaux du "$"
-        private string ResolveValue(string input, string imgpath)
+        private string? ResolveValue(string input, string imgpath)
         {
             //Test si c'est juste du texte sans "$"
             if (!input.StartsWith('$'))
             {
                 return input;
             }
-            //Ici, il y'a "$", d'abord il faut extraire le nom du token (ex: FOLDER, DATE...)
+            //Il y a un '$', d'abord il faut extraire le nom du token (ex: FOLDER, DATE...)
             string token = new(input.Skip(1).TakeWhile(char.IsLetter).ToArray()); //Le skip ne prend pas le premier caractère qui est "$", ensuite il prend les caractères qui sont des lettres et enfin il le transforme en tableau donc en un string
             //Correspondance avec le dictionnaire
             if (handlers.TryGetValue(token, out var handler))
@@ -425,11 +435,11 @@ namespace metaeditor
                 return handler(input,imgpath);
             }
             //Si rien n'est fonctionnel, alors affiche une erreur dans le TextBox (à changé après les tests)
-            return "UNKNOWN_TOKEN";
+            return null;
         }
 
         //Fonction qui gère "$FOLDER" qui est assigné dans le dictionnaire
-        private string HandleFolder(string input, string imgpath)
+        private string? HandleFolder(string input, string imgpath)
         {
             string numberPart = input.Substring(7); //prend seulement les caractères après les 7 premières caractères qui sont "$FOLDER"
             //Test si les caractères prises avec les 7 premières caractères sont un nombre
@@ -438,23 +448,23 @@ namespace metaeditor
                 return GetFolderName(imgpath, level+1);
             }
             //Si rien n'est fonctionnel, alors affiche un erreur dans le TextBox (à changer après les tests)
-            return "ERROR_FOLDER";
+            return null;
         }
 
         //Fonction qui gère "$DATE" qui est assigné dans le dictionnaire - ATTENTION ! j'ai mis input et rootpath mais je ne l'utilise pas
-        private string HandleDate(string input, string imgpath)
+        private string? HandleDate(string input, string imgpath)
         {
             return DateTime.Now.ToString("dd-MM-yyyy");
         }
 
         //Fonction qui gère "$FILENAME" qui est assigné dans le dictionnaire - ATTENTION ! j'ai mis input mais je ne l'utilise pas
-        private string HandleFilename(string input, string imgpath)
+        private string? HandleFilename(string input, string imgpath)
         {
             return Path.GetFileName(imgpath);
         }
 
         //Fonction qui gère "$PROPERTY" qui est assigné dans le dictionnaire
-        private string HandleProperty(string input, string imgpath)
+        private string? HandleProperty(string input, string imgpath)
         {
             string propertyIdstr = input.Substring(9); //prend seulement les caractères après les 9 premières caractères qui sont "$PROPERTY"
 
@@ -466,38 +476,42 @@ namespace metaeditor
                 {
                     return DecodeProperty(image.GetPropertyItem(propertyId));
                 }
-                return "ERROR_PROPERTY";
+                return null;
             }
             //Si rien n'est fonctionnel, alors affiche un erreur dans le TextBox (à changer après les tests)
-            return "ERROR_PROPERTY";
+            return null;
         }
 
         private void ApplyButton_Click(object sender, EventArgs e)
         {
-            //Parcours des items
+            //Parcours des images
             foreach (ListViewItem item in FilesView.Items)
             { 
-                //Test pour vérifier s'ils sont verts (c'est seulement les verts qui faut changer)
+                //Test pour vérifier si leur nom est vert (images sélectionnées)
                 if(item.ForeColor == Color.Green)
                 {
-                    //Parcours de displayedID et NewValue pour pouvoir tous les appliquer a chaque image
+                    //Parcours de displayedID et NewValue pour pouvoir appliquer toutes les modifications à chaque image
                     for(int i = 0; i < _PropertyEditorNb; i++)
                     {
-                        //Test pour vérifier que l'Id de propriété est bien présent dans le dictonnaire
+                        //Test pour vérifier que l'Id de propriété est bien présent dans le dictonnaire (modification valide)
                         if (propertyIds.TryGetValue(_displayedIds[i], out string? a))
                         {
                             if (item.Tag != null)
                             {
-                                //Appel du fonction EncodeProperty
-                                string value = ResolveValue(_NewValue[i], item.Tag.ToString());
-                                if(! EncodeProperty(value, _displayedIds[i], Image.FromFile(item.Tag.ToString())))
+                                //Décodage des variables '$'
+                                string? value = ResolveValue(_NewValue[i], item.Tag.ToString());
+                                if (value != null)
                                 {
-                                    item.ForeColor = Color.Orange;
-                                    throw new Exception("Error writing the property:" + _displayedIds[i] + " Value:" + value + " to image: " + item.Tag.ToString());
-                                }
-                                else
-                                {
-                                    item.ForeColor = Color.Blue;
+                                    // Encodage et application des propriétés
+                                    if (!EncodeProperty(value, _displayedIds[i], Image.FromFile(item.Tag.ToString())))
+                                    {
+                                        item.ForeColor = Color.Orange;
+                                        throw new Exception("Error writing the property: " + this.propertyIds[_displayedIds[i]] + " with the value:" + value + " to image: " + item.Tag.ToString());
+                                    }
+                                    else
+                                    {
+                                        item.ForeColor = Color.Blue;
+                                    }
                                 }
                             }
                         }
