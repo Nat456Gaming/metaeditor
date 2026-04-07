@@ -35,6 +35,17 @@ namespace metaeditor
                 }
             }
             TextDataDiaplay.Text = displayText;
+            image.Dispose();
+        }
+
+        public void Remove()
+        {
+            
+            if(PictureBox.Image != null)
+            {
+                this.Hide();
+                PictureBox.Image.Dispose();
+            }
         }
     }
 }

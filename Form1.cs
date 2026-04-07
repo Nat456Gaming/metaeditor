@@ -12,11 +12,6 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace metaeditor
 {
-
-    struct PropertyItem
-    {
-       
-    }
     public partial class MetaEditor : Form
     {
         //Déclaration du dictionnaire des handlers à "$"
@@ -414,7 +409,7 @@ namespace metaeditor
                 if (dir.Parent != null)
                     dir = dir.Parent;
                 else
-                    return ""; // ou gérer autrement (racine atteinte)
+                    return dir.Name; // ou gérer autrement (racine atteinte)
             }
             return dir.Name;
         }
@@ -486,12 +481,15 @@ namespace metaeditor
         {
             //Parcours des images
             foreach (ListViewItem item in FilesView.Items)
-            { 
+            {
                 //Test pour vérifier si leur nom est vert (images sélectionnées)
-                if(item.ForeColor == Color.Green)
+                if (item.ForeColor == Color.Green)
                 {
+                    String path = item.Tag.ToString();
+                    System.IO.File.Move(path,path + ".old");
+                    Image img = Image.FromFile(path + ".old");
                     //Parcours de displayedID et NewValue pour pouvoir appliquer toutes les modifications à chaque image
-                    for(int i = 0; i < _PropertyEditorNb; i++)
+                    for (int i = 0; i < _PropertyEditorNb; i++)
                     {
                         //Test pour vérifier que l'Id de propriété est bien présent dans le dictonnaire (modification valide)
                         if (propertyIds.TryGetValue(_displayedIds[i], out string? a))
@@ -499,11 +497,11 @@ namespace metaeditor
                             if (item.Tag != null)
                             {
                                 //Décodage des variables '$'
-                                string? value = ResolveValue(_NewValue[i], item.Tag.ToString());
+                                string? value = ResolveValue(_NewValue[i], path);
                                 if (value != null)
                                 {
                                     // Encodage et application des propriétés
-                                    if (!EncodeProperty(value, _displayedIds[i], Image.FromFile(item.Tag.ToString())))
+                                    if (!EncodeProperty(value, _displayedIds[i], img))
                                     {
                                         item.ForeColor = Color.Orange;
                                         throw new Exception("Error writing the property: " + this.propertyIds[_displayedIds[i]] + " with the value:" + value + " to image: " + item.Tag.ToString());
@@ -515,6 +513,21 @@ namespace metaeditor
                                 }
                             }
                         }
+                    }
+                    bool exception = false;
+                    try
+                    {
+                        img.Save(path);
+                    }
+                    catch
+                    {
+                        exception = true;
+                        throw new Exception("Error writing the file " + path);
+                    }
+                    img.Dispose();
+                    if (!exception)
+                    {
+                        System.IO.File.Delete(path + ".old");
                     }
                 }
             }
@@ -549,7 +562,7 @@ namespace metaeditor
                     {
                         groupName = Path.GetFileName(path);
                     }
-                    ListViewGroup group = new ListViewGroup(groupName);
+                    ListViewGroup group = new(groupName);
                     FilesView.Groups.Add(group);
                     // Images du dossier A TESTER
                     foreach (string file in Directory.GetFiles(path))
@@ -618,7 +631,7 @@ namespace metaeditor
                     FileName = FileName.Replace(" ", string.Empty);
                 }
             
-                if ((FileName.Contains(selection) && !UseRegex.Checked) || (Regex.IsMatch(FileName, '@'+selection) && UseRegex.Checked))
+                if ((FileName.Contains(selection) && !UseRegex.Checked) || (Regex.IsMatch(FileName, @selection) && UseRegex.Checked))
                 {
                     item.ForeColor = Color.Green;
                 }
@@ -653,14 +666,14 @@ namespace metaeditor
             }
             else
             {
-                _previewForm.Hide();
+                _previewForm.Remove();
                 _lastItem = null;
             }
         }
 
         private void FilesView_MouseLeave(object sender, EventArgs e)
         {
-            _previewForm.Hide();
+            _previewForm.Remove();
             _lastItem = null;
         }
         private void AddPropertyEditorButton_Click(object sender, EventArgs e)
